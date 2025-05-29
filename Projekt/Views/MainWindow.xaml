@@ -1,0 +1,92 @@
+﻿<Window x:Class="Projekt.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Projekt.Views"
+        xmlns:views="clr-namespace:Projekt.Views"
+        xmlns:local="clr-namespace:Projekt" 
+        xmlns:viewmodels="clr-namespace:Projekt.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+        mc:Ignorable="d"
+        Title="Ankiety" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Background="AliceBlue" Height="Auto">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Lewa strona: tytuł -->
+            <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left">
+                <TextBlock Text="📊 Ankiety" FontSize="20" Margin="20,10,0,10" VerticalAlignment="Center" Grid.Column="0"/>
+            </StackPanel>
+            <!-- Prawa strona: przyciski -->
+            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                <Button Margin="0,10,0,10" Padding="4" Content="⚙" ToolTip="Ustawienia" />
+                <Button Margin="10,10,0,10" Padding="4" Content="🔔" ToolTip="Powiadomienia" />
+                <Button Content="👤 Konto" Margin="10,10,20,10" Padding="6,2,10,2" Click="Login_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <Rectangle Grid.Row="1" Height="1" Fill="DarkBlue" HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Lewy panel -->
+            <ListBox x:Name="OptionsList" Grid.Column="0" Margin="0,0,0,0" Padding="5" SelectionChanged="OptionsList_SelectionChanged">
+                <ListBoxItem Content="Przeglądaj ankiety"/>
+                <ListBoxItem Content="Ulubione"/>
+                <ListBoxItem Content="Moje ankiety"/>
+            </ListBox>
+
+            <Rectangle Grid.Column="1" Width="1" Fill="DarkBlue" VerticalAlignment="Stretch"/>
+
+            <!-- Centralny panel z TabControl -->
+            <TabControl x:Name="MainTabControl" Grid.Column="2" Margin="10">
+                <!-- Pierwsza karta bez krzyżyka -->
+                <TabItem Header="Przeglądaj">
+                    <views:PollsView PollSelected="PollsListView_PollSelected" Loaded="PollsView_Loaded" />
+                </TabItem>
+                <!-- Pozostałe karty z krzyżykiem -->
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Ulubione" VerticalAlignment="Center"/>
+                            <Button Content="✖" Width="18" Height="18" Margin="5,0,0,0"
+                                    Padding="0" VerticalAlignment="Center"
+                                    Click="CloseTab_Click"
+                                    Tag="1"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TextBlock Text="Twoje ulubione ankiety" FontSize="16" Margin="10"/>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Moje ankiety" VerticalAlignment="Center"/>
+                            <Button Content="✖" Width="18" Height="18" Margin="5,0,0,0"
+                                    Padding="0" VerticalAlignment="Center"
+                                    Click="CloseTab_Click"
+                                    Tag="2"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TextBlock Text="Twoje własne ankiety" FontSize="16" Margin="10"/>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,11 @@
+<Window x:Class="Projekt.Views.PollDetailsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Szczegóły ankiety" Height="350" Width="400">
+    <StackPanel Margin="20">
+        <TextBlock x:Name="PollNameText" FontWeight="Bold" FontSize="16"/>
+        <TextBlock x:Name="PollDescText" Margin="0,5"/>
+        <ListBox x:Name="OptionsList" Margin="0,10"/>
+        <Button Content="Oddaj głos" Click="Vote_Click"/>
+    </StackPanel>
+</Window>
