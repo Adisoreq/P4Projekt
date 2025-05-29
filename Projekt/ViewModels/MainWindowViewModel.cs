@@ -1,5 +1,4 @@
-﻿
-// ViewModels/MainViewModel.cs  
+﻿// ViewModels/MainViewModel.cs  
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -10,13 +9,18 @@ using System.Linq;
 
 namespace Projekt.ViewModels
 {
-    public class MainViewModel(P4ProjektDbContext context) : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private readonly P4ProjektDbContext _context = context;
+        private readonly P4ProjektDbContext _context;
+
+        public MainWindowViewModel(P4ProjektDbContext context)
+        {
+            _context = context;
+        }
 
         public ObservableCollection<PollModel> Polls
         {
-            get => new([.. _context.Polls]);
+            get => new ObservableCollection<PollModel>(_context.Polls.ToList());
         }
 
         public void Vote(UserModel user, PollModel poll, OptionModel option)

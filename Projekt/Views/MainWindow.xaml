@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Projekt.Views"
         xmlns:views="clr-namespace:Projekt.Views"
         xmlns:local="clr-namespace:Projekt" 
-        xmlns:viewmodels="clr-namespace:Projekt.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+        xmlns:viewmodels="clr-namespace:Projekt.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="Ankiety" Height="600" Width="800">
     <Grid>
