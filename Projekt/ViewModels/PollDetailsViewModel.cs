@@ -1,44 +1,49 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using System.Windows;
 using Projekt.Models;
 
 namespace Projekt.ViewModels
 {
-    public class PollDetailsViewModel
+    public class PollDetailsViewModel : BaseViewModel
     {
         public PollModel Poll { get; }
         public ObservableCollection<OptionModel> Options { get; }
-        public OptionModel? SelectedOption { get; set; }
-        public ICommand VoteCommand { get; }
+        private OptionModel? _selectedOption;
+        private bool? _dialogResult;
 
-        public event EventHandler? VoteCompleted;
+        public OptionModel? SelectedOption
+        {
+            get => _selectedOption;
+            set { _selectedOption = value; OnPropertyChanged(); }
+        }
+
+        public bool? DialogResult
+        {
+            get => _dialogResult;
+            set { _dialogResult = value; OnPropertyChanged(); }
+        }
+
+        public ICommand VoteCommand { get; }
+        public ICommand CloseCommand { get; }
 
         public PollDetailsViewModel(PollModel poll)
         {
             Poll = poll;
             Options = new ObservableCollection<OptionModel>(poll.Options);
             VoteCommand = new RelayCommand(Vote);
+            CloseCommand = new RelayCommand(_ => DialogResult = true);
         }
 
         private void Vote(object? parameter)
         {
             if (SelectedOption != null)
             {
-                // Actual voting logic
-                MessageBox.Show($"Oddano głos na: {SelectedOption.Text}");
-                CompleteVote();
+                DialogResult = true;
             }
             else
             {
-                MessageBox.Show("Wybierz opcję!");
             }
-        }
-
-        public void CompleteVote()
-        {
-            VoteCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
 }
