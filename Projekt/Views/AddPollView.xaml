@@ -7,6 +7,7 @@
         <TextBox x:Name="PollNameBox" Margin="0,5"/>
         <TextBlock Text="Opis:"/>
         <TextBox x:Name="PollDescBox" Margin="0,5"/>
-        <Button Content="Dodaj" Margin="0,10" Click="Add_Click"/>
+        <Button Content="Dodaj ankietę" Command="{Binding AddPollCommand}" />
+        <Button Content="Dodaj opcję" Command="{Binding AddOptionCommand}" />
     </StackPanel>
 </Window>

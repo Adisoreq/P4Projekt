@@ -18,7 +18,8 @@
             <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
 
             <TextBlock x:Name="ErrorText" Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}" Foreground="Red" />
-            <Button Content="Login" Command="{Binding LoginCommand}" />
+            <Button Content="Zaloguj" Command="{Binding LoginCommand}" />
+            <!--<Button Content="Zarejestruj" Command="{Binding RegisterCommand}" />-->
         </StackPanel>
     </Grid>
 </Window>

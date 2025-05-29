@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using Projekt.Models;
 using Projekt.ViewModels;
 
@@ -12,17 +13,9 @@ namespace Projekt.Views
         public LoginView()
         {
             InitializeComponent();
-            
-            // Make sure we're using the LoginViewModel
-            DataContext = new LoginViewModel();
-            ((LoginViewModel)DataContext).LoginSucceeded += LoginView_LoginSucceeded;
-        }
-
-        private void LoginView_LoginSucceeded(object sender, EventArgs e)
-        {
-            this.DialogResult = true;
-            LoginSucceeded?.Invoke(this, EventArgs.Empty);
-            this.Close();
+            var vm = new LoginViewModel();
+            vm.RequestClose += () => { DialogResult = true; Close(); };
+            DataContext = vm;
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
@@ -37,8 +30,10 @@ namespace Projekt.Views
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            var viewModel = (LoginViewModel)DataContext;
-            viewModel.PasswordChangedCommand.Execute(PasswordBox);
+            if (DataContext is LoginViewModel viewModel)
+            {
+                viewModel.Password = ((PasswordBox)sender).Password;
+            }
         }
     }
 }

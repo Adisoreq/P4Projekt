@@ -11,9 +11,9 @@ namespace Projekt.Views
         public AddPollView()
         {
             InitializeComponent();
-            var viewModel = new AddPollViewModel();
-            viewModel.PollAdded += ViewModel_PollAdded;
-            DataContext = viewModel;
+            var vm = new AddPollViewModel();
+            vm.RequestClose += () => Close();
+            DataContext = vm;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)

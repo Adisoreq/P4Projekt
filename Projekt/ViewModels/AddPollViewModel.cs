@@ -5,55 +5,56 @@ using Projekt.Models;
 
 namespace Projekt.ViewModels
 {
-    public class AddPollViewModel
+    public class AddPollViewModel : BaseViewModel
     {
         private string _pollName = string.Empty;
         private string _pollDescription = string.Empty;
-        private ObservableCollection<OptionModel> _options = new ObservableCollection<OptionModel>();
-        
+        private ObservableCollection<OptionModel> _options = new();
+
         public string PollName
         {
             get => _pollName;
-            set => _pollName = value;
+            set { _pollName = value; OnPropertyChanged(); }
         }
-        
+
         public string PollDescription
         {
             get => _pollDescription;
-            set => _pollDescription = value;
+            set { _pollDescription = value; OnPropertyChanged(); }
         }
-        
+
         public ObservableCollection<OptionModel> Options => _options;
-        
+
         public ICommand AddPollCommand { get; }
         public ICommand AddOptionCommand { get; }
-        
-        public event EventHandler? PollAdded;
-        
+        public ICommand CloseCommand { get; }
+
+        public event Action? RequestClose;
+
         public AddPollViewModel()
         {
             AddPollCommand = new RelayCommand(AddPoll);
             AddOptionCommand = new RelayCommand(AddOption);
+            CloseCommand = new RelayCommand(_ => RequestClose?.Invoke());
         }
-        
+
         private void AddPoll(object? parameter)
         {
-            // Walidacja i dodawanie ankiety do bazy/kolekcji
             if (string.IsNullOrWhiteSpace(PollName))
                 return;
-                
-            PollModel newPoll = new PollModel
+
+            PollModel newPoll = new()
             {
                 Name = PollName,
                 Description = PollDescription,
                 Options = Options.ToList()
             };
-            
+
             // TODO: Dodaj ankietę do repozytorium
-            
-            PollAdded?.Invoke(this, EventArgs.Empty);
+
+            RequestClose?.Invoke();
         }
-        
+
         private void AddOption(object? parameter)
         {
             Options.Add(new OptionModel { Text = "Nowa opcja" });
