@@ -8,9 +8,6 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using Projekt.Models;
 using Projekt.Data;
-using Projekt.Views;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Projekt.ViewModels
 {

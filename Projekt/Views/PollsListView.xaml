@@ -4,7 +4,9 @@
              xmlns:models="clr-namespace:Projekt.Models"
              xmlns:local="clr-namespace:Projekt.Views">
     <Grid>
-        <ListBox x:Name="PollsListBox" SelectionChanged="PollsListBox_SelectionChanged">
+        <ListBox x:Name="PollsListBox" 
+                 ItemsSource="{Binding Polls}"
+                 SelectedItem="{Binding SelectedPoll, Mode=TwoWay}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="5">

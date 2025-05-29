@@ -90,7 +90,6 @@ namespace Projekt.Views
         public void ShowPollsView()
         {
             var pollsView = new PollsView();
-            // UI-specific setup if needed
         }
 
         public void ShowAddPollView()
@@ -108,7 +107,6 @@ namespace Projekt.Views
             pollDetailsView.ShowDialog();
         }
 
-        // UI event handlers that need to be connected to the ViewModel
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             viewModel.LoginCommand.Execute(null);

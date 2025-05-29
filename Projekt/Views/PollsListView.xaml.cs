@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using Projekt.Models;
+using Projekt.ViewModels;
 using System.Windows;
 
 namespace Projekt.Views
@@ -12,18 +13,11 @@ namespace Projekt.Views
         public PollsListView()
         {
             InitializeComponent();
-            LoadPolls(); // Load polls when the control is created
+            DataContext = new PollsListViewModel();
         }
 
         public void SetPolls(List<PollModel> polls)
         {
-            PollsListBox.ItemsSource = polls;
-        }
-
-        private void LoadPolls()
-        {
-            using var db = new Data.P4ProjektDbContext();
-            List<PollModel> polls = db.Polls.ToList();
             PollsListBox.ItemsSource = polls;
         }
 
