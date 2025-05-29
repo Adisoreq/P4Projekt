@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -13,80 +14,84 @@ namespace Projekt.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        private readonly P4ProjektDbContext _context;
+        private readonly P4ProjektDbContext _dbContext;
+        private TabItem _browseTab;
+        private TabItem _myPollsTab;
+        private TabItem _addPollTab;
+        private TabItem _profileTab;
+        private PollModel _selectedPoll;
         private int _selectedOptionIndex;
-        private PollModel? _selectedPoll;
 
-        public MainWindowViewModel(P4ProjektDbContext context)
+        public MainWindowViewModel(P4ProjektDbContext dbContext)
         {
-            _context = context;
-            AddPollCommand = new RelayCommand(_ => OnAddClick());
-            BrowseCommand = new RelayCommand(_ => OnBrowseClick());
-            LoginCommand = new RelayCommand(_ => OnLoginClick());
-            SelectOptionCommand = new RelayCommand<int>(OnOptionSelected);
+            _dbContext = dbContext;
+            LoginCommand = new RelayCommand(OnShowLoginRequested);
+            ShowPollsCommand = new RelayCommand(OnShowPollsRequested);
+            ShowPollDetailsCommand = new RelayCommand<PollModel>(OnShowPollDetailsRequested);
+            ShowAddPollCommand = new RelayCommand(OnShowAddPollRequested);
         }
 
         public ObservableCollection<PollModel> Polls
         {
-            get => new ObservableCollection<PollModel>(_context.Polls.ToList());
+            get => new ObservableCollection<PollModel>(_dbContext.Polls.ToList());
         }
 
-        // Properties for tab management
-        public TabItem? BrowseTab { get; set; }
-        public TabItem? MyPollsTab { get; set; }
-        public TabItem? AddPollTab { get; set; }
-        public TabItem? ProfileTab { get; set; }
-        
-        // Commands
-        public ICommand AddPollCommand { get; }
-        public ICommand BrowseCommand { get; }
-        public ICommand LoginCommand { get; }
-        public ICommand SelectOptionCommand { get; }
+        public TabItem BrowseTab
+        {
+            get => _browseTab;
+            set => _browseTab = value;
+        }
 
-        // Events for view communication
+        public TabItem MyPollsTab
+        {
+            get => _myPollsTab;
+            set => _myPollsTab = value;
+        }
+
+        public TabItem AddPollTab
+        {
+            get => _addPollTab;
+            set => _addPollTab = value;
+        }
+
+        public TabItem ProfileTab
+        {
+            get => _profileTab;
+            set => _profileTab = value;
+        }
+
+        public PollModel SelectedPoll
+        {
+            get => _selectedPoll;
+            set => _selectedPoll = value;
+        }
+
+        public int SelectedOptionIndex
+        {
+            get => _selectedOptionIndex;
+            set => _selectedOptionIndex = value;
+        }
+
+        public ICommand LoginCommand { get; }
+        public ICommand ShowPollsCommand { get; }
+        public ICommand ShowPollDetailsCommand { get; }
+        public ICommand ShowAddPollCommand { get; }
+
         public event EventHandler<TabItem> TabSelectionRequested;
         public event EventHandler ShowLoginRequested;
         public event EventHandler ShowPollsRequested;
         public event EventHandler<PollModel> ShowPollDetailsRequested;
         public event EventHandler ShowAddPollRequested;
 
-        public int SelectedOptionIndex
-        {
-            get => _selectedOptionIndex;
-            set
-            {
-                if (_selectedOptionIndex != value)
-                {
-                    _selectedOptionIndex = value;
-                    OnOptionSelected(value);
-                    OnPropertyChanged(nameof(SelectedOptionIndex));
-                }
-            }
-        }
-
-        public PollModel? SelectedPoll
-        {
-            get => _selectedPoll;
-            set
-            {
-                if (_selectedPoll != value)
-                {
-                    _selectedPoll = value;
-                    OnPollSelected(value);
-                    OnPropertyChanged(nameof(SelectedPoll));
-                }
-            }
-        }
-
         public void Initialize()
         {
             if (!UserSession.Instance.IsLoggedIn)
             {
-                OnShowLoginRequested();
+                OnShowLoginRequested(null);
             }
             else
             {
-                OnShowPollsRequested();
+                OnShowPollsRequested(null);
                 UpdateUIForLoggedInUser();
             }
         }
@@ -97,88 +102,6 @@ namespace Projekt.ViewModels
             OnPropertyChanged(nameof(UserSession.Instance.IsLoggedIn));
         }
 
-        // Command handlers
-        private void OnAddClick()
-        {
-            SelectTab(2);
-        }
-
-        private void OnBrowseClick()
-        {
-            SelectTab(0);
-        }
-
-        private void OnLoginClick()
-        {
-            SelectTab(3);
-        }
-
-        private void OnOptionSelected(int optionIndex)
-        {
-            switch (optionIndex)
-            {
-                case 0: SelectTab(0); break;
-                case 1: SelectTab(1); break;
-                case 2: SelectTab(2); break;
-                case 3: SelectTab(3); break;
-            }
-        }
-
-        // Event raisers for View communication
-        public void SelectTab(int index)
-        {
-            TabItem? tabToShow = null;
-            switch (index)
-            {
-                case 0: tabToShow = BrowseTab; break;
-                case 1: tabToShow = MyPollsTab; break;
-                case 2: tabToShow = AddPollTab; break;
-                case 3: tabToShow = ProfileTab; break;
-            }
-
-            if (tabToShow != null)
-            {
-                TabSelectionRequested?.Invoke(this, tabToShow);
-            }
-        }
-
-        public void OnShowLoginRequested()
-        {
-            ShowLoginRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void OnShowPollsRequested() 
-        {
-            ShowPollsRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void OnShowPollDetailsRequested(PollModel poll)
-        {
-            ShowPollDetailsRequested?.Invoke(this, poll);
-        }
-
-        public void OnShowAddPollRequested()
-        {
-            ShowAddPollRequested?.Invoke(this, EventArgs.Empty);
-        }
-
-        public void OnPollSelected(PollModel? poll)
-        {
-            if (poll != null)
-            {
-                OnShowPollDetailsRequested(poll);
-            }
-            else
-            {
-                MessageBox.Show("Nie wybrano ankiety.");
-            }
-        }
-
-        public void Vote(UserModel user, PollModel poll, OptionModel option)
-        {
-            OnPropertyChanged();
-        }
-
         public int DetermineTabIndex(TabItem tabItem)
         {
             if (tabItem == BrowseTab) return 0;
@@ -186,6 +109,29 @@ namespace Projekt.ViewModels
             if (tabItem == AddPollTab) return 2;
             if (tabItem == ProfileTab) return 3;
             return 0;
+        }
+
+        public void OnShowLoginRequested(object parameter)
+        {
+            ShowLoginRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnShowPollsRequested(object parameter)
+        {
+            ShowPollsRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void OnShowPollDetailsRequested(object parameter)
+        {
+            if (parameter is PollModel poll)
+            {
+                ShowPollDetailsRequested?.Invoke(this, poll);
+            }
+        }
+
+        public void OnShowAddPollRequested(object parameter)
+        {
+            ShowAddPollRequested?.Invoke(this, EventArgs.Empty);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

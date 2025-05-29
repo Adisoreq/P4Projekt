@@ -26,14 +26,13 @@ namespace Projekt.Views
                 ProfileTab = MainTabControl.Items.Count > 3 ? MainTabControl.Items[3] as TabItem : null
             };
             
-            // Set up event handlers
-            viewModel.TabSelectionRequested += ViewModel_TabSelectionRequested;
-            viewModel.ShowLoginRequested += ViewModel_ShowLoginRequested;
-            viewModel.ShowPollsRequested += ViewModel_ShowPollsRequested;
-            viewModel.ShowPollDetailsRequested += ViewModel_ShowPollDetailsRequested;
-            viewModel.ShowAddPollRequested += ViewModel_ShowAddPollRequested;
-            
             DataContext = viewModel;
+
+            // Subscribe to events in ViewModel and call View-specific methods
+            viewModel.ShowLoginRequested += (s, e) => ShowLoginView();
+            viewModel.ShowPollsRequested += (s, e) => ShowPollsView();
+            viewModel.ShowPollDetailsRequested += (s, poll) => ShowPollDetailsView(poll);
+            viewModel.ShowAddPollRequested += (s, e) => ShowAddPollView();
         }
 
         protected override void OnContentRendered(EventArgs e)
@@ -42,45 +41,13 @@ namespace Projekt.Views
             viewModel.Initialize();
         }
 
-        // ViewModel event handlers
-        private void ViewModel_TabSelectionRequested(object sender, TabItem tabItem)
-        {
-            if (!MainTabControl.Items.Contains(tabItem))
-            {
-                int index = viewModel.DetermineTabIndex(tabItem);
-                MainTabControl.Items.Insert(index, tabItem);
-            }
-            MainTabControl.SelectedItem = tabItem;
-        }
-
-        private void ViewModel_ShowLoginRequested(object sender, EventArgs e)
-        {
-            ShowLoginView();
-        }
-
-        private void ViewModel_ShowPollsRequested(object sender, EventArgs e)
-        {
-            ShowPollsView();
-        }
-
-        private void ViewModel_ShowPollDetailsRequested(object sender, PollModel poll)
-        {
-            ShowPollDetailsView(poll);
-        }
-
-        private void ViewModel_ShowAddPollRequested(object sender, EventArgs e)
-        {
-            ShowAddPollView();
-        }
-
-        // View-specific methods that must remain in the View
         public void ShowLoginView()
         {
             var loginView = new LoginView();
             loginView.Owner = this;
             loginView.LoginSucceeded += (s, e) =>
             {
-                viewModel.OnShowPollsRequested();
+                viewModel.OnShowPollsRequested(null);
                 viewModel.UpdateUIForLoggedInUser();
             };
 
@@ -96,7 +63,7 @@ namespace Projekt.Views
         {
             var addPollView = new AddPollView();
             addPollView.Owner = this;
-            addPollView.PollAdded += (s, e) => viewModel.OnShowPollsRequested();
+            addPollView.PollAdded += (s, e) => viewModel.OnShowPollsRequested(null);
             addPollView.ShowDialog();
         }
 

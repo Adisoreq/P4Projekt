@@ -41,17 +41,37 @@ namespace Projekt.ViewModels
             }
         }
 
-        public ICommand LoginCommand { get; }
-        public ICommand RegisterCommand { get; }
-        public ICommand PasswordChangedCommand { get; }
+        private ICommand _loginCommand;
+        public ICommand LoginCommand
+        {
+            get
+            {
+                return _loginCommand ?? (_loginCommand = new RelayCommand(Login));
+            }
+        }
+
+        private ICommand _registerCommand;
+        public ICommand RegisterCommand
+        {
+            get
+            {
+                return _registerCommand ?? (_registerCommand = new RelayCommand(Register));
+            }
+        }
+
+        private ICommand _passwordChangedCommand;
+        public ICommand PasswordChangedCommand
+        {
+            get
+            {
+                return _passwordChangedCommand ?? (_passwordChangedCommand = new RelayCommand<object>(PasswordChanged));
+            }
+        }
 
         public event EventHandler LoginSucceeded;
 
         public LoginViewModel()
         {
-            LoginCommand = new RelayCommand(Login);
-            RegisterCommand = new RelayCommand(Register);
-            PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
         }
 
         private void Login(object parameter)
@@ -61,7 +81,7 @@ namespace Projekt.ViewModels
             {
                 // Store user details in the singleton
                 UserSession.Instance.Login(Username, "Admin", 1);
-                
+
                 ErrorMessage = "";
                 LoginSucceeded?.Invoke(this, EventArgs.Empty);
             }
@@ -70,7 +90,7 @@ namespace Projekt.ViewModels
                 ErrorMessage = "Nieprawidłowy login lub hasło.";
             }
         }
-        
+
         private void Register(object parameter)
         {
             // Registration logic would go here
@@ -85,6 +105,20 @@ namespace Projekt.ViewModels
             {
                 Password = passwordBoxInstance.Password;
             }
+        }
+
+        private ICommand _loginSucceededCommand;
+        public ICommand LoginSucceededCommand
+        {
+            get
+            {
+                return _loginSucceededCommand ?? (_loginSucceededCommand = new RelayCommand(OnLoginSucceeded));
+            }
+        }
+
+        private void OnLoginSucceeded(object? parameter)
+        {
+            LoginSucceeded?.Invoke(this, EventArgs.Empty);
         }
     }
 }
