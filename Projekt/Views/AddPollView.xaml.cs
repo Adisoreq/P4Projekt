@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows;
-using Projekt.Models;
+using Projekt.ViewModels;
 
 namespace Projekt.Views
 {
@@ -11,11 +11,21 @@ namespace Projekt.Views
         public AddPollView()
         {
             InitializeComponent();
+            var viewModel = new AddPollViewModel();
+            viewModel.PollAdded += ViewModel_PollAdded;
+            DataContext = viewModel;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            // Dodaj ankietę do kolekcji (lub bazy danych)
+            if (DataContext is AddPollViewModel viewModel)
+            {
+                viewModel.AddPollCommand.Execute(null);
+            }
+        }
+
+        private void ViewModel_PollAdded(object sender, EventArgs e)
+        {
             PollAdded?.Invoke(this, EventArgs.Empty);
             this.Close();
         }

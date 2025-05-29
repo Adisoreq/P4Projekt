@@ -45,7 +45,8 @@
             </Grid.ColumnDefinitions>
 
             <!-- Lewy panel -->
-            <ListBox x:Name="OptionsList" Grid.Column="0" Margin="0,0,0,0" Padding="5" SelectionChanged="OptionsList_SelectionChanged">
+            <ListBox x:Name="OptionsList" Grid.Column="0" Margin="0,0,0,0" Padding="5" SelectionChanged="OptionsList_SelectionChanged"
+                     SelectedIndex="{Binding SelectedOptionIndex}">
                 <ListBoxItem Content="Przeglądaj ankiety"/>
                 <ListBoxItem Content="Ulubione"/>
                 <ListBoxItem Content="Moje ankiety"/>

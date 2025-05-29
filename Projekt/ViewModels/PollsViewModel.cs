@@ -1,6 +1,4 @@
-using Lab11.ViewModels;
 using Projekt.Models;
-using Projekt.ViewModels;
 using System.Windows.Input;
 
 namespace Projekt.ViewModels

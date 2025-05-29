@@ -27,7 +27,6 @@ namespace Projekt.Views
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
-            ((LoginViewModel)DataContext).Password = PasswordBox.Password;
             ((LoginViewModel)DataContext).LoginCommand.Execute(null);
         }
 
@@ -39,7 +38,7 @@ namespace Projekt.Views
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             var viewModel = (LoginViewModel)DataContext;
-            viewModel.Password = PasswordBox.Password;
+            viewModel.PasswordChangedCommand.Execute(PasswordBox);
         }
     }
 }

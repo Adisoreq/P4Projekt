@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Windows;
 using Projekt.Models;
+using Projekt.ViewModels;
 
 namespace Projekt.Views
 {
     public partial class PollDetailsView : Window
     {
-        private PollModel poll;
-        public event EventHandler? VoteCompleted;
-
         public PollDetailsView(PollModel poll)
         {
             InitializeComponent();
-            this.poll = poll;
-            PollNameText.Text = poll.Name;
-            PollDescText.Text = poll.Description;
-            OptionsList.ItemsSource = poll.Options;
+            var viewModel = new PollDetailsViewModel(poll);
+            viewModel.VoteCompleted += ViewModel_VoteCompleted;
+            DataContext = viewModel;
         }
 
         private void Vote_Click(object sender, RoutedEventArgs e)
         {
-            if (OptionsList.SelectedItem is OptionModel option)
+            if (DataContext is PollDetailsViewModel viewModel)
             {
-                MessageBox.Show($"Oddano głos na: {option.Text}");
-                VoteCompleted?.Invoke(this, EventArgs.Empty);
-                this.Close();
+                viewModel.SelectedOption = OptionsList.SelectedItem as OptionModel;
+                viewModel.VoteCommand.Execute(null);
             }
-            else
-            {
-                MessageBox.Show("Wybierz opcję!");
-            }
+        }
+
+        private void ViewModel_VoteCompleted(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

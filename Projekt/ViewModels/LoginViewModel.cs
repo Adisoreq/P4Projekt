@@ -1,5 +1,4 @@
-﻿using Lab11.ViewModels;
-using Projekt.Models;
+﻿using Projekt.Models;
 using System;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -44,6 +43,7 @@ namespace Projekt.ViewModels
 
         public ICommand LoginCommand { get; }
         public ICommand RegisterCommand { get; }
+        public ICommand PasswordChangedCommand { get; }
 
         public event EventHandler LoginSucceeded;
 
@@ -51,6 +51,7 @@ namespace Projekt.ViewModels
         {
             LoginCommand = new RelayCommand(Login);
             RegisterCommand = new RelayCommand(Register);
+            PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
         }
 
         private void Login(object parameter)
@@ -75,6 +76,15 @@ namespace Projekt.ViewModels
             // Registration logic would go here
             // For now, just show a placeholder message
             ErrorMessage = "Funkcja rejestracji będzie dostępna wkrótce.";
+        }
+
+        private void PasswordChanged(object passwordBox)
+        {
+            var passwordBoxInstance = passwordBox as System.Windows.Controls.PasswordBox;
+            if (passwordBoxInstance != null)
+            {
+                Password = passwordBoxInstance.Password;
+            }
         }
     }
 }
