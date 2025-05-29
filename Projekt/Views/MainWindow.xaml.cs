@@ -44,13 +44,6 @@ namespace Projekt.Views
         public void ShowLoginView()
         {
             var loginView = new LoginView();
-            loginView.Owner = this;
-            loginView.LoginSucceeded += (s, e) =>
-            {
-                viewModel.OnShowPollsRequested(null);
-                viewModel.UpdateUIForLoggedInUser();
-            };
-
             loginView.ShowDialog();
         }
 

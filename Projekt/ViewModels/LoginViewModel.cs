@@ -9,6 +9,7 @@ namespace Projekt.ViewModels
         private string _username;
         private string _password;
         private string _errorMessage;
+        private bool? _dialogResult;
 
         public string Username
         {
@@ -28,19 +29,23 @@ namespace Projekt.ViewModels
             set { _errorMessage = value; OnPropertyChanged(); }
         }
 
+        public bool? DialogResult
+        {
+            get => _dialogResult;
+            set { _dialogResult = value; OnPropertyChanged(); }
+        }
+
         public ICommand LoginCommand { get; }
         public ICommand RegisterCommand { get; }
         public ICommand PasswordChangedCommand { get; }
         public ICommand CloseCommand { get; }
-
-        public event Action? RequestClose;
 
         public LoginViewModel()
         {
             LoginCommand = new RelayCommand(Login);
             RegisterCommand = new RelayCommand(Register);
             PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
-            CloseCommand = new RelayCommand(_ => RequestClose?.Invoke());
+            CloseCommand = new RelayCommand(_ => DialogResult = true);
         }
 
         private void Login(object? parameter)
@@ -49,7 +54,7 @@ namespace Projekt.ViewModels
             {
                 UserSession.Instance.Login(Username, "Admin", 1);
                 ErrorMessage = "";
-                RequestClose?.Invoke();
+                DialogResult = true;
             }
             else
             {

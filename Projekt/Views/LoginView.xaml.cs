@@ -8,31 +8,16 @@ namespace Projekt.Views
 {
     public partial class LoginView : Window
     {
-        public event EventHandler LoginSucceeded;
-
         public LoginView()
         {
             InitializeComponent();
-            var vm = new LoginViewModel();
-            vm.RequestClose += () => { DialogResult = true; Close(); };
-            DataContext = vm;
         }
 
-        private void Login_Click(object sender, RoutedEventArgs e)
+        private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            ((LoginViewModel)DataContext).LoginCommand.Execute(null);
-        }
-
-        private void Register_Click(object sender, RoutedEventArgs e)
-        {
-            ((LoginViewModel)DataContext).RegisterCommand.Execute(null);
-        }
-
-        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is LoginViewModel viewModel)
+            if (DataContext is LoginViewModel vm && vm.PasswordChangedCommand != null)
             {
-                viewModel.Password = ((PasswordBox)sender).Password;
+                vm.PasswordChangedCommand.Execute(sender);
             }
         }
     }

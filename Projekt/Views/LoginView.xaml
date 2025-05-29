@@ -15,7 +15,7 @@
             <TextBox x:Name="UsernameBox" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
 
             <TextBlock Text="Password:" />
-            <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
+            <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_OnPasswordChanged" />
 
             <TextBlock x:Name="ErrorText" Text="{Binding ErrorMessage, UpdateSourceTrigger=PropertyChanged}" Foreground="Red" />
             <Button Content="Zaloguj" Command="{Binding LoginCommand}" />
