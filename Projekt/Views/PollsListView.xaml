@@ -65,6 +65,11 @@
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" 
+                              Command="{Binding PollSelectedCommand}"
+                              CommandParameter="{Binding SelectedPoll}"/>
+            </ListBox.InputBindings>
         </ListBox>
     </Grid>
 </UserControl>

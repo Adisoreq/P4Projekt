@@ -15,15 +15,5 @@ namespace Projekt.Views
             InitializeComponent();
             DataContext = new PollsListViewModel();
         }
-
-        public void SetPolls(List<PollModel> polls)
-        {
-            PollsListBox.ItemsSource = polls;
-        }
-
-        private void PollsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            PollSelected?.Invoke(PollsListBox.SelectedItem, new RoutedEventArgs());
-        }
     }
 }
