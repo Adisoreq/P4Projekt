@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using Projekt.Models;
 using Projekt.Services;
 using Projekt.Data;
+using Projekt.ViewModels;
 
 namespace Projekt.Views
 {
@@ -17,39 +18,17 @@ namespace Projekt.Views
         public PollsView()
         {
             InitializeComponent();
-            
-            // Create a new context and pass it to the service
-            var dbContext = new P4ProjektDbContext();
-            _pollService = new PollService(dbContext);
-            
-            LoadPolls();
+            DataContext = new PollsViewModel();
         }
 
         public PollsView(PollService pollService)
         {
             InitializeComponent();
-            _pollService = pollService;
-            LoadPolls();
-        }
-
-        private void LoadPolls()
-        {
-            if (_pollService != null)
-            {
-                var polls = _pollService.GetPolls();
-            }
-            else
-            {
-                // If no service is available, load directly from DB
-                using var db = new P4ProjektDbContext();
-                List<PollModel> polls = db.Polls.ToList();
-                PollsListViewControl.SetPolls(polls);
-            }
+            DataContext = new PollsViewModel(pollService);
         }
 
         private void PollsListViewControl_PollSelected(object sender, RoutedEventArgs e)
         {
-            // Forward the event to any parent handlers
             PollSelected?.Invoke(sender, e);
         }
     }
