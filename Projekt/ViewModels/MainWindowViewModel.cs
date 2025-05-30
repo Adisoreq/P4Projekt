@@ -2,7 +2,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -15,12 +14,10 @@ namespace Projekt.ViewModels
     public class MainWindowViewModel : BaseViewModel
     {
         private readonly P4ProjektDbContext _dbContext;
-        private TabItem _browseTab;
-        private TabItem _myPollsTab;
-        private TabItem _addPollTab;
-        private TabItem _profileTab;
         private PollModel _selectedPoll;
         private int _selectedOptionIndex;
+        private int _selectedTabIndex;
+        private ObservableCollection<TabItem> _tabs;
 
         // Events for view interactions
         public event EventHandler<EventArgs> ShowLoginRequested;
@@ -33,6 +30,7 @@ namespace Projekt.ViewModels
         {
             _dbContext = dbContext;
             Polls = new ObservableCollection<PollModel>();
+            _tabs = new ObservableCollection<TabItem>();
             
             // Initialize commands
             LoginCommand = new RelayCommand(OnShowLoginRequested);
@@ -40,33 +38,16 @@ namespace Projekt.ViewModels
             ShowPollDetailsCommand = new RelayCommand(OnShowPollDetailsRequested);
             ShowAddPollCommand = new RelayCommand(OnShowAddPollRequested);
             CloseTabCommand = new RelayCommand(CloseTab);
+            SelectTabCommand = new RelayCommand(SelectTab);
+
+            // Initialize tabs
+            InitializeTabs();
+
+            _selectedOptionIndex = 0;
+            _selectedTabIndex = 0;
         }
 
         public ObservableCollection<PollModel> Polls { get; }
-        
-        public TabItem BrowseTab 
-        { 
-            get => _browseTab; 
-            set { _browseTab = value; OnPropertyChanged(); }
-        }
-        
-        public TabItem MyPollsTab 
-        { 
-            get => _myPollsTab; 
-            set { _myPollsTab = value; OnPropertyChanged(); }
-        }
-        
-        public TabItem AddPollTab 
-        { 
-            get => _addPollTab; 
-            set { _addPollTab = value; OnPropertyChanged(); }
-        }
-        
-        public TabItem ProfileTab 
-        { 
-            get => _profileTab; 
-            set { _profileTab = value; OnPropertyChanged(); }
-        }
 
         public PollModel SelectedPoll
         {
@@ -85,7 +66,41 @@ namespace Projekt.ViewModels
         public int SelectedOptionIndex
         {
             get => _selectedOptionIndex;
-            set { _selectedOptionIndex = value; OnPropertyChanged(); }
+            set
+            {
+                if (_selectedOptionIndex != value)
+                {
+                    _selectedOptionIndex = value;
+                    OnPropertyChanged();
+                    if (_selectedTabIndex != value)
+                        SelectedTabIndex = value; // Synchronizuj indeksy tylko jeśli są różne
+                }
+            }
+        }
+
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set
+            {
+                if (_selectedTabIndex != value)
+                {
+                    _selectedTabIndex = value;
+                    OnPropertyChanged();
+                    if (_selectedOptionIndex != value)
+                        SelectedOptionIndex = value; // Synchronizuj w drugą stronę tylko jeśli są różne
+                }
+            }
+        }
+
+        public ObservableCollection<TabItem> Tabs
+        {
+            get => _tabs;
+            set
+            {
+                _tabs = value;
+                OnPropertyChanged();
+            }
         }
 
         public ICommand LoginCommand { get; }
@@ -93,12 +108,50 @@ namespace Projekt.ViewModels
         public ICommand ShowPollDetailsCommand { get; }
         public ICommand ShowAddPollCommand { get; }
         public ICommand CloseTabCommand { get; }
+        public ICommand SelectTabCommand { get; }
+
+        private void InitializeTabs()
+        {
+            // Create tabs
+            var browseTab = new TabItem { Header = "Przeglądaj" };
+            browseTab.Content = new Views.PollsView();
+
+            var favoritesTab = new TabItem { Header = CreateClosableTabHeader("Ulubione") };
+            favoritesTab.Content = new TextBlock { Text = "Twoje ulubione ankiety", FontSize = 16, Margin = new System.Windows.Thickness(10) };
+
+            var myPollsTab = new TabItem { Header = CreateClosableTabHeader("Moje ankiety") };
+            myPollsTab.Content = new TextBlock { Text = "Twoje własne ankiety", FontSize = 16, Margin = new System.Windows.Thickness(10) };
+
+            Tabs = new ObservableCollection<TabItem> { browseTab, favoritesTab, myPollsTab };
+        }
+
+        private object CreateClosableTabHeader(string headerText)
+        {
+            var header = new StackPanel { Orientation = System.Windows.Controls.Orientation.Horizontal };
+            header.Children.Add(new TextBlock { Text = headerText, VerticalAlignment = System.Windows.VerticalAlignment.Center });
+
+            var closeButton = new Button
+            {
+                Content = "✖",
+                Width = 18,
+                Height = 18,
+                Margin = new System.Windows.Thickness(5, 0, 0, 0),
+                Padding = new System.Windows.Thickness(0),
+                VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                Style = (Style)Application.Current.FindResource(ToolBar.ButtonStyleKey)
+            };
+            closeButton.Command = CloseTabCommand;
+            closeButton.CommandParameter = header.Parent; // Pass the TabItem as the command parameter
+
+            header.Children.Add(closeButton);
+            return header;
+        }
 
         public void Initialize()
         {
-            // Load data or perform initialization
-            // For now just trigger login view
             OnShowLoginRequested(null);
+            // Set default tab
+            SelectedTabIndex = 0;
         }
 
         public void UpdateUIForLoggedInUser()
@@ -108,11 +161,7 @@ namespace Projekt.ViewModels
 
         public int DetermineTabIndex(TabItem tabItem)
         {
-            if (tabItem == BrowseTab) return 0;
-            if (tabItem == MyPollsTab) return 1;
-            if (tabItem == AddPollTab) return 2;
-            if (tabItem == ProfileTab) return 3;
-            return -1;
+            return Tabs.IndexOf(tabItem);
         }
 
         public void OnShowLoginRequested(object? parameter)
@@ -154,12 +203,18 @@ namespace Projekt.ViewModels
         {
             if (parameter is TabItem tabItem)
             {
-                // Skip first tab (index 0)
-                int tabIndex = DetermineTabIndex(tabItem);
-                if (tabIndex > 0)
+                if (Tabs.Contains(tabItem))
                 {
-                    TabClosed?.Invoke(this, tabItem);
+                    Tabs.Remove(tabItem);
                 }
+            }
+        }
+
+        private void SelectTab(object? parameter)
+        {
+            if (parameter is int index)
+            {
+                SelectedTabIndex = index;
             }
         }
 

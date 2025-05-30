@@ -31,7 +31,7 @@
             <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
                 <Button Margin="0,10,0,10" Padding="4" Content="⚙" ToolTip="Ustawienia" />
                 <Button Margin="10,10,0,10" Padding="4" Content="🔔" ToolTip="Powiadomienia" />
-                <Button Content="👤 Konto" Margin="10,10,20,10" Padding="6,2,10,2" Click="Login_Click"/>
+                <Button Content="👤 Konto" Margin="10,10,20,10" Padding="6,2,10,2" Command="{Binding LoginCommand}"/>
             </StackPanel>
         </Grid>
 
@@ -44,9 +44,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Lewy panel -->
-            <ListBox x:Name="OptionsList" Grid.Column="0" Margin="0,0,0,0" Padding="5" SelectionChanged="OptionsList_SelectionChanged"
-                     SelectedIndex="{Binding SelectedOptionIndex}">
+            <!-- Lewy panel - używamy bindowania do SelectedIndex -->
+            <ListBox x:Name="OptionsList" Grid.Column="0" Margin="0,0,0,0" Padding="5" 
+                     SelectedIndex="{Binding SelectedOptionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListBoxItem Content="Przeglądaj ankiety"/>
                 <ListBoxItem Content="Ulubione"/>
                 <ListBoxItem Content="Moje ankiety"/>
@@ -54,22 +54,18 @@
 
             <Rectangle Grid.Column="1" Width="1" Fill="DarkBlue" VerticalAlignment="Stretch"/>
 
-            <!-- Centralny panel z TabControl -->
-            <TabControl x:Name="MainTabControl" Grid.Column="2" Margin="10">
+            <!-- Centralny panel z TabControl - używamy bindowania do SelectedIndex -->
+            <TabControl x:Name="MainTabControl" Grid.Column="2" Margin="10"
+                        SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <!-- Pierwsza karta bez krzyżyka -->
                 <TabItem Header="Przeglądaj">
-                    <views:PollsView PollSelected="PollsListView_PollSelected" Loaded="PollsView_Loaded" />
+                    <views:PollsView />
                 </TabItem>
                 <!-- Pozostałe karty z krzyżykiem -->
                 <TabItem>
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Ulubione" VerticalAlignment="Center"/>
-                            <Button Content="✖" Width="18" Height="18" Margin="5,0,0,0"
-                                    Padding="0" VerticalAlignment="Center"
-                                    Click="CloseTab_Click"
-                                    Tag="1"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
                         </StackPanel>
                     </TabItem.Header>
                     <TextBlock Text="Twoje ulubione ankiety" FontSize="16" Margin="10"/>
@@ -78,11 +74,6 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Moje ankiety" VerticalAlignment="Center"/>
-                            <Button Content="✖" Width="18" Height="18" Margin="5,0,0,0"
-                                    Padding="0" VerticalAlignment="Center"
-                                    Click="CloseTab_Click"
-                                    Tag="2"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
                         </StackPanel>
                     </TabItem.Header>
                     <TextBlock Text="Twoje własne ankiety" FontSize="16" Margin="10"/>
