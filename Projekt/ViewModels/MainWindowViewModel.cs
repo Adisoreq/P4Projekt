@@ -22,54 +22,68 @@ namespace Projekt.ViewModels
         private PollModel _selectedPoll;
         private int _selectedOptionIndex;
 
+        // Events for view interactions
+        public event EventHandler<EventArgs> ShowLoginRequested;
+        public event EventHandler<EventArgs> ShowPollsRequested;
+        public event EventHandler<PollModel> ShowPollDetailsRequested;
+        public event EventHandler<EventArgs> ShowAddPollRequested;
+
         public MainWindowViewModel(P4ProjektDbContext dbContext)
         {
             _dbContext = dbContext;
+            Polls = new ObservableCollection<PollModel>();
+            
+            // Initialize commands
             LoginCommand = new RelayCommand(OnShowLoginRequested);
             ShowPollsCommand = new RelayCommand(OnShowPollsRequested);
-            ShowPollDetailsCommand = new RelayCommand<PollModel>(OnShowPollDetailsRequested);
+            ShowPollDetailsCommand = new RelayCommand(OnShowPollDetailsRequested);
             ShowAddPollCommand = new RelayCommand(OnShowAddPollRequested);
         }
 
-        public ObservableCollection<PollModel> Polls
-        {
-            get => new ObservableCollection<PollModel>(_dbContext.Polls.ToList());
+        public ObservableCollection<PollModel> Polls { get; }
+        
+        public TabItem BrowseTab 
+        { 
+            get => _browseTab; 
+            set { _browseTab = value; OnPropertyChanged(); }
         }
-
-        public TabItem BrowseTab
-        {
-            get => _browseTab;
-            set => _browseTab = value;
+        
+        public TabItem MyPollsTab 
+        { 
+            get => _myPollsTab; 
+            set { _myPollsTab = value; OnPropertyChanged(); }
         }
-
-        public TabItem MyPollsTab
-        {
-            get => _myPollsTab;
-            set => _myPollsTab = value;
+        
+        public TabItem AddPollTab 
+        { 
+            get => _addPollTab; 
+            set { _addPollTab = value; OnPropertyChanged(); }
         }
-
-        public TabItem AddPollTab
-        {
-            get => _addPollTab;
-            set => _addPollTab = value;
-        }
-
-        public TabItem ProfileTab
-        {
-            get => _profileTab;
-            set => _profileTab = value;
+        
+        public TabItem ProfileTab 
+        { 
+            get => _profileTab; 
+            set { _profileTab = value; OnPropertyChanged(); }
         }
 
         public PollModel SelectedPoll
         {
             get => _selectedPoll;
-            set => _selectedPoll = value;
+            set 
+            { 
+                _selectedPoll = value; 
+                OnPropertyChanged();
+                if (value != null)
+                {
+                    OnShowPollDetailsRequested(value);
+                }
+            }
         }
 
         public int SelectedOptionIndex
         {
             get => _selectedOptionIndex;
-            set => _selectedOptionIndex = value;
+            set { _selectedOptionIndex = value; OnPropertyChanged(); }
         }
 
         public ICommand LoginCommand { get; }
@@ -77,29 +91,16 @@ namespace Projekt.ViewModels
         public ICommand ShowPollDetailsCommand { get; }
         public ICommand ShowAddPollCommand { get; }
 
-        public event EventHandler<TabItem> TabSelectionRequested;
-        public event EventHandler ShowLoginRequested;
-        public event EventHandler ShowPollsRequested;
-        public event EventHandler<PollModel> ShowPollDetailsRequested;
-        public event EventHandler ShowAddPollRequested;
-
         public void Initialize()
         {
-            if (!UserSession.Instance.IsLoggedIn)
-            {
-                OnShowLoginRequested(null);
-            }
-            else
-            {
-                OnShowPollsRequested(null);
-                UpdateUIForLoggedInUser();
-            }
+            // Load data or perform initialization
+            // For now just trigger login view
+            OnShowLoginRequested(null);
         }
 
         public void UpdateUIForLoggedInUser()
         {
-            // Logic for updating UI when user logs in
-            OnPropertyChanged(nameof(UserSession.Instance.IsLoggedIn));
+            // Update UI elements based on logged-in user
         }
 
         public int DetermineTabIndex(TabItem tabItem)
@@ -108,30 +109,42 @@ namespace Projekt.ViewModels
             if (tabItem == MyPollsTab) return 1;
             if (tabItem == AddPollTab) return 2;
             if (tabItem == ProfileTab) return 3;
-            return 0;
+            return -1;
         }
 
-        public void OnShowLoginRequested(object parameter)
+        public void OnShowLoginRequested(object? parameter)
         {
             ShowLoginRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        public void OnShowPollsRequested(object parameter)
+        public void OnShowPollsRequested(object? parameter)
         {
             ShowPollsRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        public void OnShowPollDetailsRequested(object parameter)
+        public void OnShowPollDetailsRequested(object? parameter)
         {
             if (parameter is PollModel poll)
             {
                 ShowPollDetailsRequested?.Invoke(this, poll);
             }
+            else if (SelectedPoll != null)
+            {
+                ShowPollDetailsRequested?.Invoke(this, SelectedPoll);
+            }
         }
 
-        public void OnShowAddPollRequested(object parameter)
+        public void OnShowAddPollRequested(object? parameter)
         {
             ShowAddPollRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void HandlePollSelected(PollModel selectedPoll)
+        {
+            if (selectedPoll != null)
+            {
+                SelectedPoll = selectedPoll;
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

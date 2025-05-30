@@ -28,43 +28,26 @@ namespace Projekt.Views
             
             DataContext = viewModel;
 
-            // Subscribe to events in ViewModel and call View-specific methods
-            viewModel.ShowLoginRequested += (s, e) => ShowLoginView();
-            viewModel.ShowPollsRequested += (s, e) => ShowPollsView();
-            viewModel.ShowPollDetailsRequested += (s, poll) => ShowPollDetailsView(poll);
-            viewModel.ShowAddPollRequested += (s, e) => ShowAddPollView();
+            // Subscribe to events in ViewModel and create appropriate views
+            viewModel.ShowLoginRequested += (s, e) => new LoginView().ShowDialog();
+            viewModel.ShowPollsRequested += (s, e) => new PollsView();
+            viewModel.ShowPollDetailsRequested += (s, poll) => {
+                var detailsView = new PollDetailsView(poll);
+                detailsView.Owner = this;
+                detailsView.ShowDialog();
+            };
+            viewModel.ShowAddPollRequested += (s, e) => {
+                var addView = new AddPollView();
+                addView.Owner = this;
+                addView.PollAdded += (sender, args) => viewModel.OnShowPollsRequested(null);
+                addView.ShowDialog();
+            };
         }
 
         protected override void OnContentRendered(EventArgs e)
         {
             base.OnContentRendered(e);
             viewModel.Initialize();
-        }
-
-        public void ShowLoginView()
-        {
-            var loginView = new LoginView();
-            loginView.ShowDialog();
-        }
-
-        public void ShowPollsView()
-        {
-            var pollsView = new PollsView();
-        }
-
-        public void ShowAddPollView()
-        {
-            var addPollView = new AddPollView();
-            addPollView.Owner = this;
-            addPollView.PollAdded += (s, e) => viewModel.OnShowPollsRequested(null);
-            addPollView.ShowDialog();
-        }
-
-        public void ShowPollDetailsView(PollModel poll)
-        {
-            var pollDetailsView = new PollDetailsView(poll);
-            pollDetailsView.Owner = this;
-            pollDetailsView.ShowDialog();
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
@@ -116,7 +99,6 @@ namespace Projekt.Views
 
         private void PollsView_Loaded(object sender, RoutedEventArgs e)
         {
-            // UI-specific initialization if needed
         }
     }
 }
