@@ -27,6 +27,7 @@ namespace Projekt.ViewModels
         public event EventHandler<EventArgs> ShowPollsRequested;
         public event EventHandler<PollModel> ShowPollDetailsRequested;
         public event EventHandler<EventArgs> ShowAddPollRequested;
+        public event EventHandler<TabItem> TabClosed;
 
         public MainWindowViewModel(P4ProjektDbContext dbContext)
         {
@@ -38,6 +39,7 @@ namespace Projekt.ViewModels
             ShowPollsCommand = new RelayCommand(OnShowPollsRequested);
             ShowPollDetailsCommand = new RelayCommand(OnShowPollDetailsRequested);
             ShowAddPollCommand = new RelayCommand(OnShowAddPollRequested);
+            CloseTabCommand = new RelayCommand(CloseTab);
         }
 
         public ObservableCollection<PollModel> Polls { get; }
@@ -90,6 +92,7 @@ namespace Projekt.ViewModels
         public ICommand ShowPollsCommand { get; }
         public ICommand ShowPollDetailsCommand { get; }
         public ICommand ShowAddPollCommand { get; }
+        public ICommand CloseTabCommand { get; }
 
         public void Initialize()
         {
@@ -144,6 +147,19 @@ namespace Projekt.ViewModels
             if (selectedPoll != null)
             {
                 SelectedPoll = selectedPoll;
+            }
+        }
+
+        private void CloseTab(object? parameter)
+        {
+            if (parameter is TabItem tabItem)
+            {
+                // Skip first tab (index 0)
+                int tabIndex = DetermineTabIndex(tabItem);
+                if (tabIndex > 0)
+                {
+                    TabClosed?.Invoke(this, tabItem);
+                }
             }
         }
 
