@@ -22,7 +22,21 @@ namespace Projekt.Views
             
             DataContext = viewModel;
 
-            viewModel.ShowLoginRequested += (s, e) => new LoginView().ShowDialog();
+            viewModel.ShowLoginRequested += (s, e) => {
+                var loginView = new LoginView();
+                loginView.Owner = this;
+                
+
+                var loginViewModel = new LoginViewModel();
+                loginView.DataContext = loginViewModel;
+
+                bool? result = loginView.ShowDialog();
+
+                if (result == true && UserSession.Instance.IsLoggedIn)
+                {
+                    viewModel.UpdateUIForLoggedInUser();
+                }
+            };
             viewModel.ShowPollsRequested += (s, e) => new PollsView();
             viewModel.ShowPollDetailsRequested += (s, poll) => {
                 var detailsView = new PollDetailsView(poll);

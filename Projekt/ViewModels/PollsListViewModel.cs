@@ -1,25 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Projekt.Data;
+﻿using Projekt.Data;
 using Projekt.Models;
-using System.Diagnostics;
+using Projekt.Services;
+using Projekt.ViewModels;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace Projekt.ViewModels
 {
     public class PollsListViewModel : BaseViewModel
     {
         private ObservableCollection<PollModel> _polls = new ObservableCollection<PollModel>();
+        public ObservableCollection<PollListItemViewModel> PollItems { get; set; }
+        
         private PollModel? _selectedPoll;
 
-        public PollsListViewModel()
+        public PollsListViewModel(PollService pollService)
         {
             LoadPolls();
             PollSelectedCommand = new RelayCommand(OnPollSelected);
+
+            var polls = pollService.GetPolls();
+            PollItems = new ObservableCollection<PollListItemViewModel>(
+                polls.Select(p => new PollListItemViewModel(p))
+            );
         }
 
         public ObservableCollection<PollModel> Polls

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using Projekt.Data;
 using Projekt.ViewModels;
 
 namespace Projekt.Views
@@ -11,9 +12,6 @@ namespace Projekt.Views
         public AddPollView()
         {
             InitializeComponent();
-            var vm = new AddPollViewModel();
-            vm.RequestClose += () => Close();
-            DataContext = vm;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)

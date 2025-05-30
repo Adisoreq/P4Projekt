@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using Projekt.Models;
 using Projekt.Data;
+using Projekt.Views;
 
 namespace Projekt.ViewModels
 {
@@ -39,6 +40,7 @@ namespace Projekt.ViewModels
             ShowAddPollCommand = new RelayCommand(OnShowAddPollRequested);
             CloseTabCommand = new RelayCommand(CloseTab);
             SelectTabCommand = new RelayCommand(SelectTab);
+            VoteCommand = new RelayCommand(Vote, CanVote);
 
             // Initialize tabs
             InitializeTabs();
@@ -109,6 +111,7 @@ namespace Projekt.ViewModels
         public ICommand ShowAddPollCommand { get; }
         public ICommand CloseTabCommand { get; }
         public ICommand SelectTabCommand { get; }
+        public ICommand VoteCommand { get; }
 
         private void InitializeTabs()
         {
@@ -149,14 +152,22 @@ namespace Projekt.ViewModels
 
         public void Initialize()
         {
-            OnShowLoginRequested(null);
-            // Set default tab
             SelectedTabIndex = 0;
         }
 
         public void UpdateUIForLoggedInUser()
         {
             // Update UI elements based on logged-in user
+            if (UserSession.Instance.IsLoggedIn)
+            {
+                // For example, we could update tab visibility or content based on user roles
+                var loggedInUsername = UserSession.Instance.Username;
+                var userRole = UserSession.Instance.UserRole;
+                
+                // Update tab content or visibility based on role if needed
+            }
+            
+            OnPropertyChanged(nameof(Tabs));
         }
 
         public int DetermineTabIndex(TabItem tabItem)
@@ -178,7 +189,20 @@ namespace Projekt.ViewModels
         {
             if (parameter is PollModel poll)
             {
-                ShowPollDetailsRequested?.Invoke(this, poll);
+                // Ustaw SelectedPoll, jeśli nie jest już ustawiony
+                if (SelectedPoll != poll)
+                    SelectedPoll = poll;
+
+                // Przełącz na kartę szczegółów (np. index 1 lub dynamicznie)
+                // Jeśli masz dedykowaną kartę szczegółów:
+                SelectedTabIndex = 1; // lub odpowiedni index karty szczegółów
+                // Ustaw SelectedPoll, jeśli nie jest już ustawiony
+                if (SelectedPoll != poll)
+                    SelectedPoll = poll;
+
+                // Przełącz na kartę szczegółów (np. index 1 lub dynamicznie)
+                // Jeśli masz dedykowaną kartę szczegółów:
+                SelectedTabIndex = 1; // lub odpowiedni index karty szczegółów
             }
             else if (SelectedPoll != null)
             {
@@ -188,15 +212,32 @@ namespace Projekt.ViewModels
 
         public void OnShowAddPollRequested(object? parameter)
         {
-            ShowAddPollRequested?.Invoke(this, EventArgs.Empty);
+            var addPollViewModel = new AddPollViewModel(_dbContext);
+            var addPollView = new AddPollView
+            {
+                DataContext = addPollViewModel
+            };
+
+            addPollViewModel.RequestClose += () => addPollView.Close();
+            addPollViewModel.PollAdded += () =>
+            {
+                // Odśwież listę ankiet po dodaniu nowej
+                LoadPolls();
+            };
+
+            addPollView.ShowDialog();
+        }
+
+        public void LoadPolls()
+        {
+            Polls.Clear();
+            foreach (var poll in _dbContext.Polls.ToList())
+                Polls.Add(poll);
         }
 
         public void HandlePollSelected(PollModel selectedPoll)
         {
-            if (selectedPoll != null)
-            {
-                SelectedPoll = selectedPoll;
-            }
+
         }
 
         private void CloseTab(object? parameter)
@@ -216,6 +257,57 @@ namespace Projekt.ViewModels
             {
                 SelectedTabIndex = index;
             }
+        }
+
+        private void Vote(object? parameter)
+        {
+            if (SelectedPoll == null || SelectedOptionIndex < 0)
+                return;
+
+            // Pobierz wybraną opcję
+            var poll = _dbContext.Polls
+                .Where(p => p.Id == SelectedPoll.Id)
+                .Select(p => new { p.Id, Options = p.Options.ToList() })
+                .FirstOrDefault();
+
+            if (poll == null)
+                return;
+
+            var option = poll.Options.ElementAtOrDefault(SelectedOptionIndex);
+            if (option == null)
+                return;
+
+            // Sprawdź, czy użytkownik już głosował w tej ankiecie
+            int userId = UserSession.Instance.UserId;
+            bool alreadyVoted = _dbContext.Votes.Any(v => v.PollId == poll.Id && v.UserId == userId);
+
+            if (alreadyVoted)
+            {
+                MessageBox.Show("Już oddałeś głos w tej ankiecie.", "Głosowanie", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Dodaj głos
+            var vote = new VoteModel
+            {
+                PollId = poll.Id,
+                OptionId = option.Id,
+                UserId = userId
+            };
+
+            _dbContext.Votes.Add(vote);
+            _dbContext.SaveChanges();
+
+            // Odśwież dane w UI
+            LoadPolls();
+            SelectedPoll = Polls.FirstOrDefault(p => p.Id == poll.Id);
+
+            MessageBox.Show("Twój głos został zapisany.", "Głosowanie", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private bool CanVote(object? parameter)
+        {
+            return SelectedPoll != null && SelectedOptionIndex >= 0;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

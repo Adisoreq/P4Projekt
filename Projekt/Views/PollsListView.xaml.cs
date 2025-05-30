@@ -3,6 +3,9 @@ using System.Windows.Controls;
 using Projekt.Models;
 using Projekt.ViewModels;
 using System.Windows;
+using Projekt.Services;
+using Projekt.Data;
+using System.Windows.Input;
 
 namespace Projekt.Views
 {
@@ -13,7 +16,17 @@ namespace Projekt.Views
         public PollsListView()
         {
             InitializeComponent();
-            DataContext = new PollsListViewModel();
+            var dbContext = new P4ProjektDbContext();
+            var pollService = new PollService(dbContext);
+            DataContext = new PollsListViewModel(pollService);
+        }
+
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListView listView && listView.SelectedItem != null)
+            {
+                MessageBox.Show($"You double-clicked on: {listView.SelectedItem}");
+            }
         }
     }
 }
