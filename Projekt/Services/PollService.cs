@@ -39,6 +39,7 @@ namespace Projekt.Services
 
         public async Task<PollModel> AddPoll(PollModel poll)
         {
+            _context.Options.AddRange(poll.Options);
             _context.Polls.Add(poll);
             await _context.SaveChangesAsync();
             return poll;

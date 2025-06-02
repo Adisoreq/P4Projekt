@@ -16,7 +16,7 @@
             </Style>
         </Grid.Resources>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="250">
-            <!-- Not logged in -->
+            <!-- Signing in -->
             <StackPanel Visibility="{Binding IsNotLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=False}" Height="216">
                 <TextBlock Text="Nazwa użytkownika:"/>
                 <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,0"/>

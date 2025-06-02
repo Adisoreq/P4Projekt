@@ -4,50 +4,85 @@ using System.Windows.Input;
 using Projekt.Models;
 using Projekt.Data;
 using System.Linq;
+using Projekt.Services;
+using System.Runtime.CompilerServices;
 
 namespace Projekt.ViewModels
 {
     public class AddPollViewModel : BaseViewModel
     {
-        private readonly P4ProjektDbContext _dbContext;
-        private string _pollName = string.Empty;
-        private string _pollDescription = string.Empty;
-        private ObservableCollection<OptionModel> _options = new();
-        private bool _public = true;
-        private bool _closed = false;
-        private bool _multipleChoice = false;
+        private string _NewOptionText = "Nowa opcja";
 
-        public string PollName
+        // Example data
+
+        public PollModel Poll = new PollModel 
+        { 
+            Name = "New Poll",
+            Description = "Poll description",
+
+            Author = UserSession.Instance.User,
+            AuthorId = UserSession.Instance.UserId,
+
+            Public = true,
+            Closed = false,
+            MultipleChoice = false
+        };
+        private ObservableCollection<OptionModel> _options = 
+        [
+            new OptionModel { Text = "Option 1" },
+            new OptionModel { Text = "Option 2" },
+            new OptionModel { Text = "Option 3" }
+        ];
+   
+        public string Name
         {
-            get => _pollName;
-            set { _pollName = value; OnPropertyChanged(); }
+            get => Poll.Name;
+            set { Poll.Name = value; OnPropertyChanged(); }
         }
 
-        public string PollDescription
+        public string Description
         {
-            get => _pollDescription;
-            set { _pollDescription = value; OnPropertyChanged(); }
+            get => Poll.Description;
+            set { Poll.Description = value; OnPropertyChanged(); }
         }
 
         public bool Public
         {
-            get => _public;
-            set { _public = value; OnPropertyChanged(); }
+            get => Poll.Public;
+            set { Poll.Public = value; OnPropertyChanged(); }
         }
 
         public bool Closed
         {
-            get => _closed;
-            set { _closed = value; OnPropertyChanged(); }
+            get => Poll.Closed;
+            set { Poll.Closed = value; OnPropertyChanged(); }
         }
 
         public bool MultipleChoice
         {
-            get => _multipleChoice;
-            set { _multipleChoice = value; OnPropertyChanged(); }
+            get => Poll.MultipleChoice;
+            set { Poll.MultipleChoice = value; OnPropertyChanged(); }
         }
 
-        public ObservableCollection<OptionModel> Options => _options;
+        public string NewOptionText
+        {
+            get => _NewOptionText;
+            set
+            {
+                _NewOptionText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<OptionModel> Options 
+        {
+            get => _options;
+            set
+            {
+                _options = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ICommand AddPollCommand { get; }
         public ICommand AddOptionCommand { get; }
@@ -58,7 +93,6 @@ namespace Projekt.ViewModels
 
         public AddPollViewModel(P4ProjektDbContext dbContext)
         {
-            _dbContext = dbContext;
             AddPollCommand = new RelayCommand(AddPoll);
             AddOptionCommand = new RelayCommand(AddOption);
             CloseCommand = new RelayCommand(_ => RequestClose?.Invoke());
@@ -66,32 +100,18 @@ namespace Projekt.ViewModels
 
         private void AddPoll(object? parameter)
         {
-            if (string.IsNullOrWhiteSpace(PollName))
-                return;
+            Poll.Options = [.. Options];
 
-            PollModel newPoll = new()
+            PollService.Instance.AddPoll(Poll).ContinueWith(_ =>
             {
-                Name = PollName,
-                Description = PollDescription,
-                Public = Public,
-                Closed = Closed,
-                MultipleChoice = MultipleChoice,
-                Created = DateTimeOffset.Now,
-                End = DateTimeOffset.Now.AddDays(7),
-                AuthorId = UserSession.Instance.UserId,
-                Options = Options.ToList()
-            };
-
-            _dbContext.Polls.Add(newPoll);
-            _dbContext.SaveChanges();
-
-            PollAdded?.Invoke();
-            RequestClose?.Invoke();
+                PollAdded?.Invoke();
+                RequestClose?.Invoke();
+            });
         }
 
         private void AddOption(object? parameter)
         {
-            Options.Add(new OptionModel { Text = "Nowa opcja" });
+            Options.Add(new OptionModel { Text = NewOptionText });
         }
     }
 }

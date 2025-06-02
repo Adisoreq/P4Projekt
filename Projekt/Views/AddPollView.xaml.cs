@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Projekt.Data;
+using Projekt.Services;
 using Projekt.ViewModels;
 
 namespace Projekt.Views
@@ -12,6 +13,7 @@ namespace Projekt.Views
         public AddPollView()
         {
             InitializeComponent();
+            DataContext = new AddPollViewModel(AppService.DbContext);
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)

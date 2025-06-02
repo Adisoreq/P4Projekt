@@ -21,12 +21,6 @@ namespace Projekt.Views
             DataContext = new PollsViewModel();
         }
 
-        public PollsView(PollService pollService)
-        {
-            InitializeComponent();
-            DataContext = new PollsViewModel(pollService);
-        }
-
         private void PollsListViewControl_PollSelected(object sender, RoutedEventArgs e)
         {
             PollSelected?.Invoke(sender, e);

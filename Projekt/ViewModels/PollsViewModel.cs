@@ -3,6 +3,8 @@ using System.Windows.Input;
 using Projekt.Models;
 using Projekt.Services;
 using Projekt.Data;
+using Projekt.Views;
+using System.Diagnostics;
 
 namespace Projekt.ViewModels
 {
@@ -35,21 +37,13 @@ namespace Projekt.ViewModels
             }
         }
 
+        public ICommand AddNewPollCommand { get; }
         public ICommand SelectPollCommand { get; }
         public ICommand RefreshPollsCommand { get; }
 
         public PollsViewModel()
         {
-            var dbContext = AppService.DbContext;
-            
-            SelectPollCommand = new RelayCommand(OnPollSelected);
-            RefreshPollsCommand = new RelayCommand(_ => LoadPolls());
-            
-            LoadPolls();
-        }
-
-        public PollsViewModel(PollService pollService)
-        {            
+            AddNewPollCommand = new RelayCommand(_ => ShowNewPollWindow());
             SelectPollCommand = new RelayCommand(OnPollSelected);
             RefreshPollsCommand = new RelayCommand(_ => LoadPolls());
             
@@ -68,6 +62,25 @@ namespace Projekt.ViewModels
             {
                 SelectedPoll = poll;
             }
+        }
+
+        private void ShowNewPollWindow()
+        {
+            Debug.WriteLine("Opening AddPollView...");
+
+            var addPollViewModel = new AddPollViewModel(AppService.DbContext);
+            var addPollView = new AddPollView
+            {
+                DataContext = addPollViewModel
+            };
+
+            addPollViewModel.RequestClose += () => addPollView.Close();
+            addPollViewModel.PollAdded += () =>
+            {
+                LoadPolls();
+            };
+
+            addPollView.ShowDialog();
         }
     }
 }

@@ -15,9 +15,14 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Utwórz nową" DockPanel.Dock="Top" Margin="5" Padding="6,2"/>
+            <Button Grid.Column="0" 
+                    Content="Utwórz nową" 
+                    DockPanel.Dock="Top" 
+                    Margin="5" 
+                    Padding="6,2"
+                    Command="{Binding AddNewPollCommand}"/>
             <TextBox Grid.Column="1" x:Name="SearchBox" VerticalAlignment="Stretch" Margin="5" FontSize="12" Padding="2" Text="Search..."/>
-            <Button Grid.Column="2" Content="☰" Margin="5" Padding="6,2"/>
+            <Button Grid.Column="2" Content="☰" Margin="5" Padding="6,2" Command="{Binding AddNewPollCommand}"/>
         </Grid>
         <local:PollsListView x:Name="PollsListViewControl" PollSelected="PollsListViewControl_PollSelected"/>
     </DockPanel>

@@ -1,13 +1,47 @@
 <Window x:Class="Projekt.Views.AddPollView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:viewmodels="clr-namespace:Projekt.ViewModels" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=viewmodels:AddPollViewModel}"
         Title="Dodaj ankietę" Height="300" Width="400">
     <StackPanel Margin="20">
         <TextBlock Text="Nazwa ankiety:"/>
-        <TextBox x:Name="PollNameBox" Margin="0,5"/>
+        <TextBox x:Name="PollNameBox" Margin="0,5" Text="{Binding Name}"/>
         <TextBlock Text="Opis:"/>
-        <TextBox x:Name="PollDescBox" Margin="0,5"/>
+        <TextBox x:Name="PollDescBox" Margin="0,5" Text="{Binding Description}" />
+        <Grid Margin="0,5,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Opcje:"/>
+            <TextBox Grid.Column="1" Margin="10,0,5,0" Text="{Binding NewOptionText}"/>
+            <Button Grid.Column="2" Content="Dodaj opcję" Command="{Binding AddOptionCommand}" />
+        </Grid>
+
+        <ListBox ItemsSource="{Binding Options}" Margin="5">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+
+                        <TextBlock 
+                            DockPanel.Dock="Left"
+                            Text="{Binding Text}" Margin="0,0,10,0"
+                            HorizontalAlignment="Stretch"
+                            />
+
+                        <Button DockPanel.Dock="Right"
+                                Content="X" 
+                                Command="{Binding DataContext.RemoveOptionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                CommandParameter="{Binding}"/>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <Button Content="Dodaj ankietę" Command="{Binding AddPollCommand}" />
-        <Button Content="Dodaj opcję" Command="{Binding AddOptionCommand}" />
     </StackPanel>
 </Window>
