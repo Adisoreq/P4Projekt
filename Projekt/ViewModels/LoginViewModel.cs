@@ -1,11 +1,14 @@
 ﻿using Projekt.Models;
 using System;
 using System.Windows.Input;
+using System.Linq;
+using Projekt.Data;
 
 namespace Projekt.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
+        private readonly P4ProjektDbContext _dbContext;
         private string _username;
         private string _password;
         private string _errorMessage;
@@ -35,25 +38,44 @@ namespace Projekt.ViewModels
             set { _dialogResult = value; OnPropertyChanged(); }
         }
 
-        public ICommand LoginCommand { get; }
-        public ICommand RegisterCommand { get; }
+        public bool IsLoggedIn => UserSession.Instance.IsLoggedIn;
+        public bool IsNotLoggedIn => !UserSession.Instance.IsLoggedIn;
+        public string LoggedInUsername => UserSession.Instance.Username;
+        public string LoggedInEmail => UserSession.Instance.Email;
+
+        public ICommand LoginCommand { get; set; }
+        public ICommand RegisterCommand { get; set; }
         public ICommand PasswordChangedCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand LogoutCommand { get; set; }
 
+        // Public parameterless constructor
         public LoginViewModel()
         {
+            // Initialize properties and commands
+        }
+
+        public LoginViewModel(P4ProjektDbContext dbContext)
+        {
+            _dbContext = dbContext;
             LoginCommand = new RelayCommand(Login);
             RegisterCommand = new RelayCommand(Register);
             PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
             CloseCommand = new RelayCommand(_ => DialogResult = true);
+            LogoutCommand = new RelayCommand(Logout);
         }
 
         private void Login(object? parameter)
         {
-            if (Username == "admin" && Password == "admin")
+            var user = _dbContext.Users.FirstOrDefault(u => u.Name == Username && u.Password == Password);
+            if (user != null)
             {
-                UserSession.Instance.Login(Username, "Admin", 1);
+                UserSession.Instance.Login(user.Name, "User", user.Id, user.Email);
                 ErrorMessage = "";
+                OnPropertyChanged(nameof(IsLoggedIn));
+                OnPropertyChanged(nameof(IsNotLoggedIn));
+                OnPropertyChanged(nameof(LoggedInUsername));
+                OnPropertyChanged(nameof(LoggedInEmail));
                 DialogResult = true;
             }
             else
@@ -71,6 +93,16 @@ namespace Projekt.ViewModels
         {
             if (passwordBox is System.Windows.Controls.PasswordBox pb)
                 Password = pb.Password;
+        }
+
+        private void Logout(object? parameter)
+        {
+            UserSession.Instance.Logout();
+            OnPropertyChanged(nameof(IsLoggedIn));
+            OnPropertyChanged(nameof(IsNotLoggedIn));
+            OnPropertyChanged(nameof(LoggedInUsername));
+            OnPropertyChanged(nameof(LoggedInEmail));
+            DialogResult = false;
         }
     }
 }

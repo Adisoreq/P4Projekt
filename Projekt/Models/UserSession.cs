@@ -29,19 +29,22 @@ namespace Projekt.Models
         public string Username { get; private set; }
         public string UserRole { get; private set; }
         public int UserId { get; private set; }
+        public string Email { get; private set; }
 
         private UserSession()
         {
             IsLoggedIn = false;
             Username = string.Empty;
             UserRole = string.Empty;
+            Email = string.Empty;
         }
 
-        public void Login(string username, string role, int id)
+        public void Login(string username, string role, int id, string email)
         {
             Username = username;
             UserRole = role;
             UserId = id;
+            Email = email;
             IsLoggedIn = true;
         }
 
@@ -51,6 +54,7 @@ namespace Projekt.Models
             Username = string.Empty;
             UserRole = string.Empty;
             UserId = 0;
+            Email = string.Empty;
         }
     }
 }

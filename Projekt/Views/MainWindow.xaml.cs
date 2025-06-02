@@ -27,7 +27,7 @@ namespace Projekt.Views
                 loginView.Owner = this;
                 
 
-                var loginViewModel = new LoginViewModel();
+                var loginViewModel = new LoginViewModel(dbContext);
                 loginView.DataContext = loginViewModel;
 
                 bool? result = loginView.ShowDialog();

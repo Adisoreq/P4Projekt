@@ -8,9 +8,16 @@ namespace Projekt.Services
     {
         private readonly P4ProjektDbContext _context;
 
+        public static readonly PollService _instance = new PollService(new P4ProjektDbContext());
+
         public PollService(P4ProjektDbContext context)
         {
             _context = context;
+        }
+
+        public static PollService Instance
+        {
+            get { return _instance; }
         }
 
         public PollModel[] GetPolls()
