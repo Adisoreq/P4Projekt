@@ -56,5 +56,10 @@ namespace Projekt.Views
             base.OnContentRendered(e);
             viewModel.Initialize();
         }
+
+        private void PollsView_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -199,7 +199,7 @@ namespace Projekt.ViewModels
 
         public void OnShowAddPollRequested(object? parameter)
         {
-            var addPollViewModel = new AddPollViewModel(_dbContext);
+            var addPollViewModel = new AddPollViewModel();
             var addPollView = new AddPollView
             {
                 DataContext = addPollViewModel

@@ -1,47 +1,91 @@
 <Window x:Class="Projekt.Views.AddPollView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-        xmlns:viewmodels="clr-namespace:Projekt.ViewModels" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Projekt.Views"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=viewmodels:AddPollViewModel}"
-        Title="Dodaj ankietę" Height="300" Width="400">
-    <StackPanel Margin="20">
-        <TextBlock Text="Nazwa ankiety:"/>
-        <TextBox x:Name="PollNameBox" Margin="0,5" Text="{Binding Name}"/>
-        <TextBlock Text="Opis:"/>
-        <TextBox x:Name="PollDescBox" Margin="0,5" Text="{Binding Description}" />
-        <Grid Margin="0,5,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Opcje:"/>
-            <TextBox Grid.Column="1" Margin="10,0,5,0" Text="{Binding NewOptionText}"/>
-            <Button Grid.Column="2" Content="Dodaj opcję" Command="{Binding AddOptionCommand}" />
-        </Grid>
+        Title="Dodaj nową ankietę" Height="700" Width="500"
+        WindowStartupLocation="CenterOwner">
+    
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Poll Name -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Nazwa ankiety:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding Name}" Padding="5" />
+        </StackPanel>
+        
+        <!-- Poll Description -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Opis ankiety:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding Description}" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Padding="5"/>
+        </StackPanel>
 
-        <ListBox ItemsSource="{Binding Options}" Margin="5">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel>
+        <!-- Poll Settings -->
+        <GroupBox Grid.Row="2" Header="Ustawienia ankiety" Margin="0,0,0,10">
+            <StackPanel Margin="5">
+                <CheckBox Content="Ankieta publiczna" IsChecked="{Binding Public}" Margin="0,5,0,5"/>
+                <CheckBox Content="Zamknięta dla głosowania" IsChecked="{Binding Closed}" Margin="0,5,0,5"/>
+                <CheckBox Content="Wielokrotny wybór" IsChecked="{Binding MultipleChoice}" Margin="0,5,0,5"/>
+            </StackPanel>
+        </GroupBox>
 
-                        <TextBlock 
-                            DockPanel.Dock="Left"
-                            Text="{Binding Text}" Margin="0,0,10,0"
-                            HorizontalAlignment="Stretch"
-                            />
+        <!-- Categories Selection -->
+        <GroupBox Grid.Row="3" Header="Kategorie ankiety" Margin="0,0,0,10">
+            <StackPanel>
+                <ListBox ItemsSource="{Binding Categories}" SelectionMode="Multiple" Height="100" Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </GroupBox>
 
-                        <Button DockPanel.Dock="Right"
-                                Content="X" 
-                                Command="{Binding DataContext.RemoveOptionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"/>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <Button Content="Dodaj ankietę" Command="{Binding AddPollCommand}" />
-    </StackPanel>
+        <!-- Poll Options -->
+        <GroupBox Grid.Row="4" Header="Opcje odpowiedzi" Margin="0,0,0,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Options List -->
+                <ListBox Grid.Row="0" ItemsSource="{Binding Options}" Margin="5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+                <!-- Add new option -->
+                <Grid Grid.Row="1" Margin="5,10,5,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding NewOptionText}" Padding="5" />
+                    <Button Grid.Column="1" Content="Dodaj opcję" Command="{Binding AddOptionCommand}" Margin="5,0,0,0" Padding="5,3"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Anuluj" Click="Cancel_Click" Width="100" Margin="0,0,10,0" Padding="5"/>
+            <Button Content="Dodaj ankietę" Click="Add_Click" Command="{Binding AddPollCommand}" Width="100" Padding="5"/>
+        </StackPanel>
+    </Grid>
 </Window>

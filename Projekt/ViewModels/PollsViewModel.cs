@@ -68,7 +68,7 @@ namespace Projekt.ViewModels
         {
             Debug.WriteLine("Opening AddPollView...");
 
-            var addPollViewModel = new AddPollViewModel(AppService.DbContext);
+            var addPollViewModel = new AddPollViewModel();
             var addPollView = new AddPollView
             {
                 DataContext = addPollViewModel

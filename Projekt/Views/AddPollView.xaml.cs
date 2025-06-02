@@ -13,7 +13,7 @@ namespace Projekt.Views
         public AddPollView()
         {
             InitializeComponent();
-            DataContext = new AddPollViewModel(AppService.DbContext);
+            DataContext = new AddPollViewModel();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -27,6 +27,11 @@ namespace Projekt.Views
         private void ViewModel_PollAdded(object sender, EventArgs e)
         {
             PollAdded?.Invoke(this, EventArgs.Empty);
+            this.Close();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
             this.Close();
         }
     }

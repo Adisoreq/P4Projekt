@@ -11,9 +11,8 @@ namespace Projekt.ViewModels
 {
     public class AddPollViewModel : BaseViewModel
     {
+        private readonly P4ProjektDbContext _dbContext;
         private string _NewOptionText = "Nowa opcja";
-
-        // Example data
 
         public PollModel Poll = new PollModel 
         { 
@@ -27,12 +26,15 @@ namespace Projekt.ViewModels
             Closed = false,
             MultipleChoice = false
         };
+        
         private ObservableCollection<OptionModel> _options = 
         [
             new OptionModel { Text = "Option 1" },
             new OptionModel { Text = "Option 2" },
             new OptionModel { Text = "Option 3" }
         ];
+        
+        private ObservableCollection<CategoryViewModel> _categories = new();
    
         public string Name
         {
@@ -83,6 +85,16 @@ namespace Projekt.ViewModels
                 OnPropertyChanged();
             }
         }
+        
+        public ObservableCollection<CategoryViewModel> Categories
+        {
+            get => _categories;
+            set
+            {
+                _categories = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ICommand AddPollCommand { get; }
         public ICommand AddOptionCommand { get; }
@@ -91,19 +103,43 @@ namespace Projekt.ViewModels
         public event Action? RequestClose;
         public event Action? PollAdded;
 
-        public AddPollViewModel(P4ProjektDbContext dbContext)
-        {
+        public AddPollViewModel()
+        {   
             AddPollCommand = new RelayCommand(AddPoll);
             AddOptionCommand = new RelayCommand(AddOption);
             CloseCommand = new RelayCommand(_ => RequestClose?.Invoke());
+            
+            LoadCategories();
+        }
+        
+        private void LoadCategories()
+        {
+            var allCategories = PollService.Instance.GetCategories();
         }
 
         private void AddPoll(object? parameter)
         {
             Poll.Options = [.. Options];
-
+            
+            var selectedCategories = Categories.Where(c => c.IsSelected).Select(c => c.Category).ToList();
+            
             PollService.Instance.AddPoll(Poll).ContinueWith(_ =>
             {
+                PollModel newPoll = new PollModel
+                {
+                    Author = UserSession.Instance.User,
+                    AuthorId = UserSession.Instance.UserId,
+
+                    Name = Name,
+                    Description = Description,
+                    Public = Public,
+                    Closed = Closed,
+                    MultipleChoice = MultipleChoice,
+                    Options = [.. Options],
+                    Categories = [.. selectedCategories]
+                };
+                PollService.Instance.AddPoll(newPoll);
+                
                 PollAdded?.Invoke();
                 RequestClose?.Invoke();
             });
@@ -111,7 +147,30 @@ namespace Projekt.ViewModels
 
         private void AddOption(object? parameter)
         {
-            Options.Add(new OptionModel { Text = NewOptionText });
+            if (!string.IsNullOrWhiteSpace(NewOptionText))
+            {
+                Options.Add(new OptionModel { Text = NewOptionText });
+                NewOptionText = "Nowa opcja";
+            }
+        }
+    }
+    
+    // ViewModel class for category selection
+    public class CategoryViewModel : BaseViewModel
+    {
+        private bool _isSelected;
+        
+        public CategoryModel Category { get; set; }
+        public string Name => Category?.Name ?? string.Empty;
+        
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+            }
         }
     }
 }

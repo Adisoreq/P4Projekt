@@ -75,6 +75,11 @@ namespace Projekt.Services
                                    .Where(p => p.Public)];
         }
 
+        public CategoryModel[] GetCategories()
+        {
+            return _context.Categories.ToArray();
+        }
+
         public async Task AddVote(VoteModel vote)
         {
             _context.Votes.Add(vote);
