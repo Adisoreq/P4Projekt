@@ -4,23 +4,12 @@ namespace Projekt.Models
 {
     public class UserSession
     {
-        private static UserSession _instance = new();
-        private static readonly object _lock = new object();
+        private static readonly UserSession _instance = new UserSession();
 
         public static UserSession Instance
         {
             get
             {
-                if (_instance == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new UserSession();
-                        }
-                    }
-                }
                 return _instance;
             }
         }
