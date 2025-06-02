@@ -157,14 +157,9 @@ namespace Projekt.ViewModels
 
         public void UpdateUIForLoggedInUser()
         {
-            // Update UI elements based on logged-in user
             if (UserSession.Instance.IsLoggedIn)
             {
-                // For example, we could update tab visibility or content based on user roles
                 var loggedInUsername = UserSession.Instance.Username;
-                var userRole = UserSession.Instance.UserRole;
-                
-                // Update tab content or visibility based on role if needed
             }
             
             OnPropertyChanged(nameof(Tabs));
@@ -189,20 +184,12 @@ namespace Projekt.ViewModels
         {
             if (parameter is PollModel poll)
             {
-                // Ustaw SelectedPoll, jeśli nie jest już ustawiony
                 if (SelectedPoll != poll)
                     SelectedPoll = poll;
-
-                // Przełącz na kartę szczegółów (np. index 1 lub dynamicznie)
-                // Jeśli masz dedykowaną kartę szczegółów:
-                SelectedTabIndex = 1; // lub odpowiedni index karty szczegółów
-                // Ustaw SelectedPoll, jeśli nie jest już ustawiony
+                SelectedTabIndex = 1;
                 if (SelectedPoll != poll)
                     SelectedPoll = poll;
-
-                // Przełącz na kartę szczegółów (np. index 1 lub dynamicznie)
-                // Jeśli masz dedykowaną kartę szczegółów:
-                SelectedTabIndex = 1; // lub odpowiedni index karty szczegółów
+                SelectedTabIndex = 1;
             }
             else if (SelectedPoll != null)
             {
@@ -221,7 +208,6 @@ namespace Projekt.ViewModels
             addPollViewModel.RequestClose += () => addPollView.Close();
             addPollViewModel.PollAdded += () =>
             {
-                // Odśwież listę ankiet po dodaniu nowej
                 LoadPolls();
             };
 

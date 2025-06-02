@@ -3,6 +3,8 @@ using System;
 using System.Windows.Input;
 using System.Linq;
 using Projekt.Data;
+using Projekt.Services;
+using System.Diagnostics;
 
 namespace Projekt.ViewModels
 {
@@ -49,10 +51,15 @@ namespace Projekt.ViewModels
         public ICommand CloseCommand { get; }
         public ICommand LogoutCommand { get; set; }
 
-        // Public parameterless constructor
+
         public LoginViewModel()
         {
-            // Initialize properties and commands
+            ErrorMessage = string.Empty;
+            LoginCommand = new RelayCommand(Login);
+            RegisterCommand = new RelayCommand(Register);
+            PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
+            CloseCommand = new RelayCommand(_ => DialogResult = true);
+            LogoutCommand = new RelayCommand(Logout);
         }
 
         public LoginViewModel(P4ProjektDbContext dbContext)
@@ -67,20 +74,26 @@ namespace Projekt.ViewModels
 
         private void Login(object? parameter)
         {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Name == Username && u.Password == Password);
+            var user = UserService.LogInAsUser(Username, Password);
+            
             if (user != null)
             {
-                UserSession.Instance.Login(user.Name, "User", user.Id, user.Email);
-                ErrorMessage = "";
+                Debug.WriteLine($"Zalogowano jako: {user.Name}");
+
+                UserSession.Instance.Login(Username, Password);
                 OnPropertyChanged(nameof(IsLoggedIn));
                 OnPropertyChanged(nameof(IsNotLoggedIn));
                 OnPropertyChanged(nameof(LoggedInUsername));
                 OnPropertyChanged(nameof(LoggedInEmail));
                 DialogResult = true;
+                ErrorMessage = string.Empty;
             }
             else
             {
+                Debug.WriteLine($"Błąd: Nieznany użytkownik");
+
                 ErrorMessage = "Nieprawidłowy login lub hasło.";
+                OnPropertyChanged(nameof(ErrorMessage));
             }
         }
 

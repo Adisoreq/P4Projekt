@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Projekt.Models;
+using Projekt.Services;
+using Projekt.ViewModels;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Projekt.Models;
-using Projekt.ViewModels;
 
 namespace Projekt.Views
 {
@@ -11,6 +12,7 @@ namespace Projekt.Views
         public LoginView()
         {
             InitializeComponent();
+            DataContext = new LoginViewModel(AppService.DbContext);
         }
 
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)

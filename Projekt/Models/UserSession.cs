@@ -1,3 +1,4 @@
+using Projekt.Services;
 using System;
 
 namespace Projekt.Models
@@ -14,38 +15,57 @@ namespace Projekt.Models
             }
         }
 
-        public UserModel? user { get; set; }
-
+        public UserModel? User { get; set; }
         public bool IsLoggedIn { get; private set; }
-        public string Username { get; private set; }
-        public string UserRole { get; private set; }
-        public int UserId { get; private set; }
-        public string Email { get; private set; }
+        public string Username 
+        {
+            get { 
+                if (User != null) return User.Name;
+                else return string.Empty;
+            } 
+        }
+        public int UserId 
+        {
+            get
+            {
+                if (User != null) return User.Id;
+                else return -1;
+            }
+        }
+        public string Email 
+        {
+            get
+            {
+                if (User != null) return User.Email;
+                else return string.Empty;
+            }
+        }
 
         private UserSession()
         {
             IsLoggedIn = false;
-            Username = string.Empty;
-            UserRole = string.Empty;
-            Email = string.Empty;
+            User = null;
         }
 
-        public void Login(string username, string role, int id, string email)
+        public void Login(string username, string password)
         {
-            Username = username;
-            UserRole = role;
-            UserId = id;
-            Email = email;
-            IsLoggedIn = true;
+            UserModel? LoginUser = UserService.LogInAsUser(username, password);
+            
+            if (LoginUser == null)
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            } 
+            else
+            {
+                User = LoginUser;
+                IsLoggedIn = true;
+            }         
         }
 
         public void Logout()
         {
             IsLoggedIn = false;
-            Username = string.Empty;
-            UserRole = string.Empty;
-            UserId = 0;
-            Email = string.Empty;
+            User = null;
         }
     }
 }
