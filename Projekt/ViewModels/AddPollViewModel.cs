@@ -131,32 +131,54 @@ namespace Projekt.ViewModels
             }
         }
 
-        private void AddPoll(object? parameter)
+        private async void AddPoll(object? parameter)
         {
-            Poll.Options = [.. Options];
-            
-            var selectedCategories = Categories.Where(c => c.IsSelected).Select(c => c.Category).ToList();
-            
-            PollService.Instance.AddPoll(Poll).ContinueWith(_ =>
+            try
             {
+                // Create a new poll with all required properties
                 PollModel newPoll = new PollModel
                 {
-                    Author = UserSession.Instance.User,
-                    AuthorId = UserSession.Instance.UserId,
-
                     Name = Name,
                     Description = Description,
+                    Author = UserSession.Instance.User,
+                    AuthorId = UserSession.Instance.UserId,
                     Public = Public,
                     Closed = Closed,
                     MultipleChoice = MultipleChoice,
-                    Options = [.. Options],
-                    Categories = [.. selectedCategories]
+                    Created = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddDays(7) // Default 7 day duration
                 };
-                PollService.Instance.AddPoll(newPoll);
+
+                // Add options to the poll
+                foreach (var option in Options)
+                {
+                    // Create new option objects to avoid tracking issues
+                    newPoll.Options.Add(new OptionModel 
+                    { 
+                        Text = option.Text 
+                    });
+                }
                 
+                // Add selected categories
+                var selectedCategories = Categories.Where(c => c.IsSelected).Select(c => c.Category).ToList();
+                foreach (var category in selectedCategories)
+                {
+                    newPoll.Categories.Add(category);
+                }
+                
+                // Add the poll to the database asynchronously
+                await PollService.Instance.AddPoll(newPoll);
+                
+                // Notify subscribers that a poll was added
                 PollAdded?.Invoke();
+                
+                // Close the dialog
                 RequestClose?.Invoke();
-            });
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error adding poll: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
 
         private void AddOption(object? parameter)

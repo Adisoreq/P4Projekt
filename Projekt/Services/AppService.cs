@@ -5,7 +5,9 @@ namespace Projekt.Services
 {
     public class AppService : IService
     {
-        private static readonly P4ProjektDbContext _dbContext = new P4ProjektDbContext();
+        private static readonly Lazy<P4ProjektDbContext> _dbContextLazy = 
+            new Lazy<P4ProjektDbContext>(() => new P4ProjektDbContext());
+        
         private static readonly AppService _instance = new AppService();
 
         public AppService()
@@ -20,6 +22,6 @@ namespace Projekt.Services
             return _instance != null;
         }
 
-        public static P4ProjektDbContext DbContext { get { return _dbContext; } }
+        public static P4ProjektDbContext DbContext { get { return _dbContextLazy.Value; } }
     }
 }
