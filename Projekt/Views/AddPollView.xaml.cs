@@ -12,17 +12,46 @@ namespace Projekt.Views
     public partial class AddPollView : Window
     {
         public event EventHandler? PollAdded;
+        private bool _initializationCompleted = false;
 
         public AddPollView()
         {
             InitializeComponent();
+            
+            if (!UserSession.Instance.IsLoggedIn)
+            {
+                if (!ShowLoginAndContinue())
+                {
+                    return;
+                }
+            }
+            
+            InitializeViewModel();
+        }
+
+        private bool ShowLoginAndContinue()
+        {
+            // Create and show login view
+            var loginView = new LoginView();
+            var loginViewModel = new LoginViewModel();
+            loginView.DataContext = loginViewModel;
+            
+            bool? result = loginView.ShowDialog();
+            
+            return result == true && UserSession.Instance.IsLoggedIn;
+        }
+        
+        private void InitializeViewModel()
+        {
             DataContext = new AddPollViewModel();
             
-            // Subscribe to the view model's PollAdded event
             if (DataContext is AddPollViewModel viewModel)
             {
                 viewModel.PollAdded += ViewModel_PollAdded;
+                viewModel.RequestClose += () => this.Close();
             }
+            
+            _initializationCompleted = true;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -36,7 +65,6 @@ namespace Projekt.Views
         private void ViewModel_PollAdded()
         {
             PollAdded?.Invoke(this, EventArgs.Empty);
-            this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -53,6 +81,17 @@ namespace Projekt.Views
                     viewModel.RemoveOptionCommand.Execute(option);
                     e.Handled = true; // Mark the event as handled
                 }
+            }
+        }
+        
+        protected override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+            
+            // If initialization wasn't completed (login failed/canceled), close the window
+            if (!_initializationCompleted)
+            {
+                this.Close();
             }
         }
     }
