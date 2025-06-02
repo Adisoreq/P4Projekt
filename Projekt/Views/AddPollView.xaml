@@ -65,7 +65,7 @@
                 <ListBox Grid.Row="0" ItemsSource="{Binding Options}" Margin="5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Text}" />
+                            <TextBlock Text="{Binding Text}" MouseLeftButtonDown="Option_MouseDoubleClick"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

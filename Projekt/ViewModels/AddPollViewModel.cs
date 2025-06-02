@@ -98,6 +98,7 @@ namespace Projekt.ViewModels
 
         public ICommand AddPollCommand { get; }
         public ICommand AddOptionCommand { get; }
+        public ICommand RemoveOptionCommand { get; }
         public ICommand CloseCommand { get; }
 
         public event Action? RequestClose;
@@ -107,6 +108,7 @@ namespace Projekt.ViewModels
         {   
             AddPollCommand = new RelayCommand(AddPoll);
             AddOptionCommand = new RelayCommand(AddOption);
+            RemoveOptionCommand = new RelayCommand<OptionModel>(RemoveOption);
             CloseCommand = new RelayCommand(_ => RequestClose?.Invoke());
             
             LoadCategories();
@@ -115,6 +117,18 @@ namespace Projekt.ViewModels
         private void LoadCategories()
         {
             var allCategories = PollService.Instance.GetCategories();
+            if (allCategories != null)
+            {
+                Categories.Clear();
+                foreach (var category in allCategories)
+                {
+                    Categories.Add(new CategoryViewModel 
+                    { 
+                        Category = category, 
+                        IsSelected = false 
+                    });
+                }
+            }
         }
 
         private void AddPoll(object? parameter)
@@ -151,6 +165,14 @@ namespace Projekt.ViewModels
             {
                 Options.Add(new OptionModel { Text = NewOptionText });
                 NewOptionText = "Nowa opcja";
+            }
+        }
+
+        private void RemoveOption(OptionModel option)
+        {
+            if (option != null && Options.Contains(option))
+            {
+                Options.Remove(option);
             }
         }
     }
