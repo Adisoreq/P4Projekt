@@ -31,9 +31,8 @@ namespace Projekt.ViewModels
 
             using (var dbContext = new P4ProjektDbContext())
             {
-                PollService pollService = new PollService(dbContext);
 
-                var categories = pollService.getPollCategories(Poll.Id);
+                var categories = PollService.Instance.getPollCategories(Poll.Id);
 
                 if (categories != null)
                 {

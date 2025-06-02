@@ -9,17 +9,10 @@ namespace ProjektTest
     {
         public static void Main(string[] args)
         {
-            // Utwórz instancję DbContext
-            using (var dbContext = new P4ProjektDbContext())
+            using (var dbContext = AppService.DbContext)
             {
-                // Utwórz instancję PollService
-                var pollService = new PollService(dbContext);
-
-                // Przykładowe ID ankiety
                 int pollId = 1;
-
-                // Pobierz kategorie ankiety
-                var categories = pollService.getPollCategories(pollId);
+                var categories = PollService.Instance.getPollCategories(pollId);
 
                 // Wyświetl kategorie
                 Console.WriteLine($"Kategorie dla ankiety o ID {pollId}:");

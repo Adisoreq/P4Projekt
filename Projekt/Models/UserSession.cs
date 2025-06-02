@@ -14,6 +14,8 @@ namespace Projekt.Models
             }
         }
 
+        public UserModel? user { get; set; }
+
         public bool IsLoggedIn { get; private set; }
         public string Username { get; private set; }
         public string UserRole { get; private set; }

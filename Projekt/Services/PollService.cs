@@ -4,20 +4,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Projekt.Services
 {
-    public class PollService
+    public class PollService : IService
     {
         private readonly P4ProjektDbContext _context;
+        private static readonly PollService _instance = new PollService();
 
-        public static readonly PollService _instance = new PollService(new P4ProjektDbContext());
-
-        public PollService(P4ProjektDbContext context)
+        public PollService()
         {
-            _context = context;
+            _context = AppService.DbContext;
         }
 
         public static PollService Instance
         {
             get { return _instance; }
+        }
+
+        public static bool IsValid()
+        {
+            return _instance != null;
         }
 
         public PollModel[] GetPolls()

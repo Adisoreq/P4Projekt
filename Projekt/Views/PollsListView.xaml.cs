@@ -16,9 +16,8 @@ namespace Projekt.Views
         public PollsListView()
         {
             InitializeComponent();
-            var dbContext = new P4ProjektDbContext();
-            var pollService = new PollService(dbContext);
-            DataContext = new PollsListViewModel(pollService);
+            var dbContext = AppService.DbContext;
+            DataContext = new PollsListViewModel(PollService.Instance);
         }
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

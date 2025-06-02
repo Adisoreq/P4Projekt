@@ -8,7 +8,6 @@ namespace Projekt.ViewModels
 {
     public class PollsViewModel : BaseViewModel
     {
-        private readonly PollService _pollService;
         private ObservableCollection<PollModel> _polls = new ObservableCollection<PollModel>();
         private PollModel? _selectedPoll;
 
@@ -41,8 +40,7 @@ namespace Projekt.ViewModels
 
         public PollsViewModel()
         {
-            var dbContext = new P4ProjektDbContext();
-            _pollService = new PollService(dbContext);
+            var dbContext = AppService.DbContext;
             
             SelectPollCommand = new RelayCommand(OnPollSelected);
             RefreshPollsCommand = new RelayCommand(_ => LoadPolls());
@@ -51,9 +49,7 @@ namespace Projekt.ViewModels
         }
 
         public PollsViewModel(PollService pollService)
-        {
-            _pollService = pollService;
-            
+        {            
             SelectPollCommand = new RelayCommand(OnPollSelected);
             RefreshPollsCommand = new RelayCommand(_ => LoadPolls());
             
@@ -62,7 +58,7 @@ namespace Projekt.ViewModels
 
         private void LoadPolls()
         {
-            var pollsList = _pollService.GetPolls();
+            var pollsList = PollService.Instance.GetPolls();
             Polls = new ObservableCollection<PollModel>(pollsList);
         }
 
