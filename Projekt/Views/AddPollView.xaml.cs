@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Projekt.Data;
 using Projekt.Models;
@@ -16,6 +17,12 @@ namespace Projekt.Views
         {
             InitializeComponent();
             DataContext = new AddPollViewModel();
+            
+            // Subscribe to the view model's PollAdded event
+            if (DataContext is AddPollViewModel viewModel)
+            {
+                viewModel.PollAdded += ViewModel_PollAdded;
+            }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -26,7 +33,7 @@ namespace Projekt.Views
             }
         }
 
-        private void ViewModel_PollAdded(object sender, EventArgs e)
+        private void ViewModel_PollAdded()
         {
             PollAdded?.Invoke(this, EventArgs.Empty);
             this.Close();
@@ -39,11 +46,12 @@ namespace Projekt.Views
 
         private void Option_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2 && sender is FrameworkElement element && element.DataContext is OptionModel option)
+            if (sender is ListBoxItem item && item.DataContext is OptionModel option)
             {
                 if (DataContext is AddPollViewModel viewModel)
                 {
                     viewModel.RemoveOptionCommand.Execute(option);
+                    e.Handled = true; // Mark the event as handled
                 }
             }
         }

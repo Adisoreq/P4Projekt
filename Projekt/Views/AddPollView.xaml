@@ -34,8 +34,8 @@
         <!-- Poll Settings -->
         <GroupBox Grid.Row="2" Header="Ustawienia ankiety" Margin="0,0,0,10">
             <StackPanel Margin="5">
-                <CheckBox Content="Ankieta publiczna" IsChecked="{Binding Public}" Margin="0,5,0,5"/>
-                <CheckBox Content="Zamknięta dla głosowania" IsChecked="{Binding Closed}" Margin="0,5,0,5"/>
+                <CheckBox Content="Publiczna" IsChecked="{Binding Public}" Margin="0,5,0,5"/>
+                <CheckBox Content="Zakończona" IsChecked="{Binding Closed}" Margin="0,5,0,5"/>
                 <CheckBox Content="Wielokrotny wybór" IsChecked="{Binding MultipleChoice}" Margin="0,5,0,5"/>
             </StackPanel>
         </GroupBox>
@@ -63,9 +63,14 @@
                 
                 <!-- Options List -->
                 <ListBox Grid.Row="0" ItemsSource="{Binding Options}" Margin="5">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="Option_MouseDoubleClick"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Text}" MouseLeftButtonDown="Option_MouseDoubleClick"/>
+                            <TextBlock Text="{Binding Text}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
