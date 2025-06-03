@@ -14,11 +14,10 @@ namespace Projekt.ViewModels
 
         public string Title {
             get => Poll.Name;
-            set 
-            {
-                Poll.Name = value;
-                OnPropertyChanged(nameof(Poll));
-            }
+        }
+
+        public string Description {
+            get => Poll.Description;
         }
 
         public OptionModel? SelectedOption
