@@ -12,6 +12,15 @@ namespace Projekt.ViewModels
         private OptionModel? _selectedOption;
         private bool? _dialogResult;
 
+        public string Title {
+            get => Poll.Name;
+            set 
+            {
+                Poll.Name = value;
+                OnPropertyChanged(nameof(Poll));
+            }
+        }
+
         public OptionModel? SelectedOption
         {
             get => _selectedOption;
