@@ -1,5 +1,4 @@
 ﻿// ViewModels/MainViewModel.cs  
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,14 +6,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using Projekt.Models;
-using Projekt.Data;
 using Projekt.Views;
+using Projekt.Services;
 
 namespace Projekt.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        private readonly P4ProjektDbContext _dbContext;
         private PollModel _selectedPoll;
         private int _selectedOptionIndex;
         private int _selectedTabIndex;
@@ -27,10 +25,8 @@ namespace Projekt.ViewModels
         public event EventHandler<EventArgs> ShowAddPollRequested;
         public event EventHandler<TabItem> TabClosed;
 
-        public MainWindowViewModel(P4ProjektDbContext dbContext)
+        public MainWindowViewModel()
         {
-            _dbContext = dbContext;
-            Polls = new ObservableCollection<PollModel>();
             _tabs = new ObservableCollection<TabItem>();
             
             // Initialize commands
@@ -49,7 +45,7 @@ namespace Projekt.ViewModels
             _selectedTabIndex = 0;
         }
 
-        public ObservableCollection<PollModel> Polls { get; }
+        public ObservableCollection<PollModel> Polls { get => new(PollService.Instance.GetPolls()); }
 
         public PollModel SelectedPoll
         {
@@ -75,7 +71,7 @@ namespace Projekt.ViewModels
                     _selectedOptionIndex = value;
                     OnPropertyChanged();
                     if (_selectedTabIndex != value)
-                        SelectedTabIndex = value; // Synchronizuj indeksy tylko jeśli są różne
+                        SelectedTabIndex = value;
                 }
             }
         }
@@ -90,7 +86,7 @@ namespace Projekt.ViewModels
                     _selectedTabIndex = value;
                     OnPropertyChanged();
                     if (_selectedOptionIndex != value)
-                        SelectedOptionIndex = value; // Synchronizuj w drugą stronę tylko jeśli są różne
+                        SelectedOptionIndex = value;
                 }
             }
         }
@@ -144,7 +140,7 @@ namespace Projekt.ViewModels
                 Style = (Style)Application.Current.FindResource(ToolBar.ButtonStyleKey)
             };
             closeButton.Command = CloseTabCommand;
-            closeButton.CommandParameter = header.Parent; // Pass the TabItem as the command parameter
+            closeButton.CommandParameter = header.Parent;
 
             header.Children.Add(closeButton);
             return header;
@@ -217,7 +213,7 @@ namespace Projekt.ViewModels
         public void LoadPolls()
         {
             Polls.Clear();
-            foreach (var poll in _dbContext.Polls.ToList())
+            foreach (var poll in AppService.DbContext.Polls.ToList())
                 Polls.Add(poll);
         }
 
@@ -250,8 +246,7 @@ namespace Projekt.ViewModels
             if (SelectedPoll == null || SelectedOptionIndex < 0)
                 return;
 
-            // Pobierz wybraną opcję
-            var poll = _dbContext.Polls
+            var poll = AppService.DbContext.Polls
                 .Where(p => p.Id == SelectedPoll.Id)
                 .Select(p => new { p.Id, Options = p.Options.ToList() })
                 .FirstOrDefault();
@@ -263,9 +258,8 @@ namespace Projekt.ViewModels
             if (option == null)
                 return;
 
-            // Sprawdź, czy użytkownik już głosował w tej ankiecie
             int userId = UserSession.Instance.UserId;
-            bool alreadyVoted = _dbContext.Votes.Any(v => v.PollId == poll.Id && v.UserId == userId);
+            bool alreadyVoted = AppService.DbContext.Votes.Any(v => v.PollId == poll.Id && v.UserId == userId);
 
             if (alreadyVoted)
             {
@@ -281,8 +275,8 @@ namespace Projekt.ViewModels
                 UserId = userId
             };
 
-            _dbContext.Votes.Add(vote);
-            _dbContext.SaveChanges();
+            AppService.DbContext.Votes.Add(vote);
+            AppService.DbContext.SaveChanges();
 
             // Odśwież dane w UI
             LoadPolls();

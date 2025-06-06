@@ -8,20 +8,25 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:PollDetailsViewModel}"
         Title="Szczegóły ankiety" Height="350" Width="400">
     <StackPanel Margin="20,19,20,21">
-        <TextBlock x:Name="PollNameTextLabel" Text="Title" FontSize="12"/>
         <TextBlock x:Name="PollNameText" Text="{Binding Title}" FontWeight="Bold" FontSize="16"/>
-        <TextBlock x:Name="PollDesTextLabel" Text="Description" FontSize="12"/>
         <TextBlock x:Name="PollDescText" Text="{Binding Description}" Margin="0,5"/>
-        <ListBox x:Name="OptionsList" Margin="0,10" ItemsSource="{Binding Options}" SelectedItem="{Binding SelectedOption}" Height="100">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}"/>
-                        <TextBlock Text="{Binding Description}" Margin="5,0,0,0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <!-- Opcje -->
+        <StackPanel Orientation="Vertical" Margin="0,10" Visibility="Hidden">
+            <ItemsControl ItemsSource="{Binding Options}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Text}" />
+                            <Button Content="X" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
         <Button Content="Głosuj" Command="{Binding VoteCommand}" />
     </StackPanel>
 </Window>

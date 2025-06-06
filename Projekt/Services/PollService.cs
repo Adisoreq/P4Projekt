@@ -26,8 +26,9 @@ namespace Projekt.Services
 
         public PollModel[] GetPolls()
         {
-            return [.. _context.Polls.Include(p => p.Options)
-                                   .Include(p => p.Author)];
+            return [.. _context.Polls
+                .Include(p => p.Options)
+                .Include(p => p.Author)];
         }
 
         public PollModel? GetPollById(int id)

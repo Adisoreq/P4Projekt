@@ -15,10 +15,8 @@ namespace Projekt.Views
         public MainWindow()
         {
             InitializeComponent();
-            
-            var dbContext = new P4ProjektDbContext();
-
-            viewModel = new MainWindowViewModel(dbContext);
+           
+            viewModel = new MainWindowViewModel();
             
             DataContext = viewModel;
 
@@ -27,7 +25,7 @@ namespace Projekt.Views
                 loginView.Owner = this;
                 
 
-                var loginViewModel = new LoginViewModel(dbContext);
+                var loginViewModel = new LoginViewModel();
                 loginView.DataContext = loginViewModel;
 
                 bool? result = loginView.ShowDialog();

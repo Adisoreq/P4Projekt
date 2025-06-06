@@ -12,7 +12,7 @@ namespace Projekt.Views
         public LoginView()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel(AppService.DbContext);
+            DataContext = new LoginViewModel();
         }
 
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)

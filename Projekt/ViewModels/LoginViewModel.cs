@@ -10,7 +10,6 @@ namespace Projekt.ViewModels
 {
     public class LoginViewModel : BaseViewModel
     {
-        private readonly P4ProjektDbContext _dbContext;
         private string _username;
         private string _password;
         private string _errorMessage;
@@ -61,17 +60,6 @@ namespace Projekt.ViewModels
             CloseCommand = new RelayCommand(_ => DialogResult = true);
             LogoutCommand = new RelayCommand(Logout);
         }
-
-        public LoginViewModel(P4ProjektDbContext dbContext)
-        {
-            _dbContext = dbContext;
-            LoginCommand = new RelayCommand(Login);
-            RegisterCommand = new RelayCommand(Register);
-            PasswordChangedCommand = new RelayCommand<object>(PasswordChanged);
-            CloseCommand = new RelayCommand(_ => DialogResult = true);
-            LogoutCommand = new RelayCommand(Logout);
-        }
-
         private void Login(object? parameter)
         {
             var user = UserService.LogInAsUser(Username, Password);

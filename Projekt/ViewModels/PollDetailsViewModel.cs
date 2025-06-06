@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Projekt.Models;
+using Projekt.Services;
 
 namespace Projekt.ViewModels
 {
     public class PollDetailsViewModel : BaseViewModel
     {
-        public PollModel Poll { get; }
-        public ObservableCollection<OptionModel> Options { get; }
+        private PollModel _poll;
+        public PollModel Poll { get => _poll; }
+        public OptionModel[] Options { get => [.. Poll.Options]; }
         private OptionModel? _selectedOption;
         private bool? _dialogResult;
 
@@ -37,10 +38,36 @@ namespace Projekt.ViewModels
 
         public PollDetailsViewModel(PollModel poll)
         {
-            Poll = poll;
-            Options = new ObservableCollection<OptionModel>(poll.Options);
+            //_poll = poll;
             VoteCommand = new RelayCommand(Vote);
             CloseCommand = new RelayCommand(_ => DialogResult = true);
+
+            // tymczasowo
+            _poll = new PollModel
+            {
+                Name = "Poll",
+                Description = "Desc",
+                Options = [
+                    new OptionModel {
+                        Id = 3205325,
+                        Text = "Option A",
+                        Poll = Poll,
+                        PollId = Poll.Id
+                    },
+                    new OptionModel {
+                        Id = 3205326,
+                        Text = "Option B",
+                        Poll = Poll,
+                        PollId = Poll.Id
+                    },
+                    new OptionModel {
+                        Id = 3205327,
+                        Text = "Option C",
+                        Poll = Poll,
+                        PollId = Poll.Id
+                    }
+                ]
+            };
         }
 
         private void Vote(object? parameter)

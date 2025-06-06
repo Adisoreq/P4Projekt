@@ -25,15 +25,7 @@ namespace Projekt.ViewModels
             );
         }
 
-        public ObservableCollection<PollModel> Polls
-        {
-            get => _polls;
-            set
-            {
-                _polls = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<PollModel> Polls = new(PollService.Instance.GetPolls());
 
         public PollModel? SelectedPoll
         {
@@ -49,9 +41,7 @@ namespace Projekt.ViewModels
 
         private void LoadPolls()
         {
-            using var db = new P4ProjektDbContext();
-            var polls = db.Polls.ToList();
-            Polls = new ObservableCollection<PollModel>(polls);
+            Polls = new ObservableCollection<PollModel>(PollService.Instance.GetPolls());
         }
 
         private void OnPollSelected(object? parameter)

@@ -52,8 +52,7 @@ namespace Projekt.ViewModels
 
         private void LoadPolls()
         {
-            var pollsList = PollService.Instance.GetPolls();
-            Polls = new ObservableCollection<PollModel>(pollsList);
+            _polls = new ObservableCollection<PollModel>(PollService.Instance.GetPolls());
         }
 
         private void OnPollSelected(object? parameter)
@@ -66,8 +65,6 @@ namespace Projekt.ViewModels
 
         private void ShowNewPollWindow()
         {
-            Debug.WriteLine("Opening AddPollView...");
-
             var addPollViewModel = new AddPollViewModel();
             var addPollView = new AddPollView
             {
