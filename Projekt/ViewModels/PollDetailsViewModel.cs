@@ -9,7 +9,7 @@ namespace Projekt.ViewModels
     {
         private PollModel _poll;
         public PollModel Poll { get => _poll; }
-        public OptionModel[] Options { get => [.. Poll.Options]; }
+        public OptionModel[] Options { get => Poll.Options.ToArray(); }
         private OptionModel? _selectedOption;
         private bool? _dialogResult;
 
@@ -38,36 +38,22 @@ namespace Projekt.ViewModels
 
         public PollDetailsViewModel(PollModel poll)
         {
-            //_poll = poll;
+            _poll = poll;  // Uncomment this line to use the actual poll
             VoteCommand = new RelayCommand(Vote);
             CloseCommand = new RelayCommand(_ => DialogResult = true);
 
-            // tymczasowo
+            // Remove the temporary code that creates a hardcoded poll
+            // The line below is causing your actual poll to be ignored
+            /*
             _poll = new PollModel
             {
                 Name = "Poll",
                 Description = "Desc",
                 Options = [
-                    new OptionModel {
-                        Id = 3205325,
-                        Text = "Option A",
-                        Poll = Poll,
-                        PollId = Poll.Id
-                    },
-                    new OptionModel {
-                        Id = 3205326,
-                        Text = "Option B",
-                        Poll = Poll,
-                        PollId = Poll.Id
-                    },
-                    new OptionModel {
-                        Id = 3205327,
-                        Text = "Option C",
-                        Poll = Poll,
-                        PollId = Poll.Id
-                    }
+                    // ...options...
                 ]
             };
+            */
         }
 
         private void Vote(object? parameter)

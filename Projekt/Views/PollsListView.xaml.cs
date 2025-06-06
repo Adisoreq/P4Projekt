@@ -16,7 +16,6 @@ namespace Projekt.Views
         public PollsListView()
         {
             InitializeComponent();
-            var dbContext = AppService.DbContext;
             DataContext = new PollsListViewModel(PollService.Instance);
         }
 
@@ -24,7 +23,18 @@ namespace Projekt.Views
         {
             if (sender is ListView listView && listView.SelectedItem != null)
             {
-                MessageBox.Show($"You double-clicked on: {listView.SelectedItem}");
+                if (listView.SelectedItem is PollModel poll)
+                {
+                    // Create and show PollDetailsView with the selected poll
+                    var detailsView = new PollDetailsView(poll);
+                    detailsView.ShowDialog();
+                }
+                else if (listView.SelectedItem is PollListItemViewModel viewModel)
+                {
+                    // If using view models, extract the Poll property
+                    var detailsView = new PollDetailsView(viewModel.Poll);
+                    detailsView.ShowDialog();
+                }
             }
         }
     }

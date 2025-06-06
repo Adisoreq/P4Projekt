@@ -88,7 +88,6 @@ namespace Projekt.Views
         {
             base.OnContentRendered(e);
             
-            // If initialization wasn't completed (login failed/canceled), close the window
             if (!_initializationCompleted)
             {
                 this.Close();
